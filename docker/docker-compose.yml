@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres
+    container_name: perps-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: perps_exchange
+      POSTGRES_PASSWORD: perps
+    ports:
+      - "5432:5432"
+    volumes:
+      - perps-postgres-data:/var/lib/postgresql
+
+  redis:
+    image: redis
+    container_name: perps-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - perps-redis-data:/data
+
+volumes:
+  perps-postgres-data:
+  perps-redis-data:
