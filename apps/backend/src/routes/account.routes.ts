@@ -3,6 +3,7 @@ import { requireAuth, type AuthRequest } from "../middleware/auth";
 import { validateBody } from "../middleware/validate";
 import { onRampSchema } from "../schemas/order.schema";
 import { sendToEngine } from "../services/loopback";
+import { prisma } from "@repo/db";
 
 export const accountRouter = Router();
 
