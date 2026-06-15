@@ -67,8 +67,8 @@ export type EngineRequest =
   | {
       type: "CREATE_ORDER";
       requestId: string;
-      userId: string;
       payload: {
+        userId: string;
         marketId: string;
         side: Side;
         orderType: OrderType;
@@ -81,8 +81,8 @@ export type EngineRequest =
   | {
       type: "CANCEL_ORDER";
       requestId: string;
-      userId: string;
       payload: {
+        userId: string;
         marketId: string;
         orderId: string;
       };
@@ -97,18 +97,23 @@ export type EngineRequest =
   | {
       type: "GET_BALANCE";
       requestId: string;
-      userId: string;
+      payload: {
+        userId: string;
+      };
     }
   | {
       type: "GET_POSITIONS";
       requestId: string;
-      userId: string;
+      payload: {
+        userId: string;
+      };
     }
   | {
       type: "ON_RAMP";
       requestId: string;
       userId: string;
       payload: {
+        userId: string;
         amount: string;
       };
     };
