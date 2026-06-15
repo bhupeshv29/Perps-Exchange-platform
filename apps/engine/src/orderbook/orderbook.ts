@@ -112,6 +112,7 @@ export function removeOrderFromBook(order: Order) {
 
   const book = getOrCreateOrderbook(order.marketId);
   const sideBook = order.side === "BID" ? book.bids : book.asks;
+
   const ordersAtPrice = sideBook[order.price];
 
   if (!ordersAtPrice) return;

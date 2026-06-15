@@ -5,6 +5,7 @@ import type { EngineRequest, EngineResponse, Order } from "@repo/common";
 import { balances, orders } from "../state/state";
 import {
   addOrderToBook,
+  getDepth,
   getOrCreateOrderbook,
   updateOrderStatus,
 } from "../orderbook/orderbook";
@@ -13,6 +14,7 @@ import {
   applyFillsToPositions,
   getProportionalMargin,
 } from "../position/position";
+import { publishDbEvent, publishWsEvent } from "../publish/events";
 
 function releaseUnfilledMargin(order: Order) {
   const balance = balances[order.userId];
@@ -80,6 +82,12 @@ export async function processCreateOrder(
 
   orders[order.id] = order;
 
+  await publishDbEvent({
+    type: "ORDER_CREATED",
+    payload: order,
+    createdAt: Date.now(),
+  });
+
   const book = getOrCreateOrderbook(marketId);
 
   const fills = side === "BID" ? matchBid(book, order) : matchAsk(book, order);
@@ -100,6 +108,12 @@ export async function processCreateOrder(
     if (order.filledQty === 0) {
       order.status = "REJECTED";
 
+      await publishDbEvent({
+        type: "ORDER_UPDATED",
+        payload: order,
+        createdAt: Date.now(),
+      });
+
       return {
         type: "ORDER_REJECTED",
         requestId: request.requestId,
@@ -107,6 +121,48 @@ export async function processCreateOrder(
       };
     }
   }
+
+  for (const fill of fills) {
+    await publishDbEvent({
+      type: "FILL_CREATED",
+      payload: fill,
+      createdAt: Date.now(),
+    });
+
+    await publishWsEvent({
+      type: "TRADE_UPDATE",
+      marketId,
+      payload: fill,
+      createdAt: Date.now(),
+    });
+  }
+
+  await publishDbEvent({
+    type: "ORDER_UPDATED",
+    payload: order,
+    createdAt: Date.now(),
+  });
+
+  await publishWsEvent({
+    type: "ORDER_UPDATE",
+    userId,
+    payload: order,
+    createdAt: Date.now(),
+  });
+
+  await publishWsEvent({
+    type: "BALANCE_UPDATE",
+    userId,
+    payload: balance,
+    createdAt: Date.now(),
+  });
+
+  await publishWsEvent({
+    type: "DEPTH_UPDATE",
+    marketId,
+    payload: getDepth(marketId),
+    createdAt: Date.now(),
+  });
 
   return {
     type: "ORDER_ACCEPTED",

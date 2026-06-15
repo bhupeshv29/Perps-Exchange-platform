@@ -1,12 +1,13 @@
 import type { EngineRequest, EngineResponse } from "@repo/common";
 import { balances, orders } from "../state/state";
-import { removeOrderFromBook } from "../orderbook/orderbook";
+import { getDepth, removeOrderFromBook } from "../orderbook/orderbook";
 import { getProportionalMargin } from "../position/position";
+import { publishDbEvent, publishWsEvent } from "../publish/events";
 
 export async function processCancelOrder(
   request: Extract<EngineRequest, { type: "CANCEL_ORDER" }>,
 ): Promise<EngineResponse> {
-  const { userId, orderId } = request.payload;
+  const { userId, marketId, orderId } = request.payload;
 
   const order = orders[orderId];
 
@@ -47,6 +48,35 @@ export async function processCancelOrder(
   }
 
   order.status = "CANCELLED";
+
+  await publishDbEvent({
+    type: "ORDER_UPDATED",
+    payload: order,
+    createdAt: Date.now(),
+  });
+
+  await publishWsEvent({
+    type: "ORDER_UPDATE",
+    userId,
+    payload: order,
+    createdAt: Date.now(),
+  });
+
+  if (balance) {
+    await publishWsEvent({
+      type: "BALANCE_UPDATE",
+      userId,
+      payload: balance,
+      createdAt: Date.now(),
+    });
+  }
+
+  await publishWsEvent({
+    type: "DEPTH_UPDATE",
+    marketId,
+    payload: getDepth(marketId),
+    createdAt: Date.now(),
+  });
 
   return {
     type: "ORDER_CANCELLED",
