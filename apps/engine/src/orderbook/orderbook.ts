@@ -17,22 +17,60 @@ export function getOrCreateOrderbook(marketId: string): Orderbook {
 export function addOrderToBook(order: Order) {
   const book = getOrCreateOrderbook(order.marketId);
   const sideBook = order.side === "BUY" ? book.bids : book.asks;
-  const price = order.price!;
 
-  if (!sideBook[price]) {
-    sideBook[price] = [];
+  if (!order.price) {
+    throw new Error("limit order price is required");
   }
 
-  sideBook[price].push(order);
+  if (!sideBook[order.price]) {
+    sideBook[order.price] = [];
+  }
+
+  sideBook[order.price]!.push(order);
+}
+
+export function updateOrderStatus(order: Order) {
+  if (order.filledQty === 0) {
+    order.status = "OPEN";
+    return;
+  }
+
+  if (order.filledQty < order.qty) {
+    order.status = "PARTIALLY_FILLED";
+    return;
+  }
+
+  order.status = "FILLED";
+}
+
+export function removeFilledOrdersFromBook(book: Orderbook) {
+  for (const price of Object.keys(book.bids)) {
+    book.bids[Number(price)] = book.bids[Number(price)]!.filter(
+      (order) => order.filledQty < order.qty,
+    );
+
+    if (book.bids[Number(price)]!.length === 0) {
+      delete book.bids[Number(price)];
+    }
+  }
+
+  for (const price of Object.keys(book.asks)) {
+    book.asks[Number(price)] = book.asks[Number(price)]!.filter(
+      (order) => order.filledQty < order.qty,
+    );
+
+    if (book.asks[Number(price)]!.length === 0) {
+      delete book.asks[Number(price)];
+    }
+  }
 }
 
 function aggregateSide(sideBook: Record<number, Order[]>): [number, number][] {
   return Object.entries(sideBook)
     .map(([price, orders]) => {
-      const qty = orders.reduce(
-        (sum, order) => sum + (order.qty - order.filledQty),
-        0,
-      );
+      const qty = orders.reduce((sum, order) => {
+        return sum + (order.qty - order.filledQty);
+      }, 0);
 
       return [Number(price), qty] as [number, number];
     })
@@ -47,4 +85,24 @@ export function getDepth(marketId: string): Depth {
     bids: aggregateSide(book.bids).sort((a, b) => b[0] - a[0]),
     asks: aggregateSide(book.asks).sort((a, b) => a[0] - b[0]),
   };
+}
+
+export function getBestAskPrice(book: Orderbook): number | null {
+  const prices = Object.keys(book.asks).map(Number);
+
+  if (prices.length === 0) {
+    return null;
+  }
+
+  return Math.min(...prices);
+}
+
+export function getBestBidPrice(book: Orderbook): number | null {
+  const prices = Object.keys(book.bids).map(Number);
+
+  if (prices.length === 0) {
+    return null;
+  }
+
+  return Math.max(...prices);
 }
