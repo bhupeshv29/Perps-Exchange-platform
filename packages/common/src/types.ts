@@ -111,7 +111,6 @@ export type EngineRequest =
   | {
       type: "ON_RAMP";
       requestId: string;
-      userId: string;
       payload: {
         userId: string;
         amount: string;
