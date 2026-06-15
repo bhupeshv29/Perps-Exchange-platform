@@ -16,15 +16,14 @@ export type Order = {
   marketId: string;
   side: Side;
   type: OrderType;
-  price?: string;
-  qty: string;
-  filledQty: string;
+  price?: number;
+  qty: number;
+  filledQty: number;
+  margin: number;
+  leverage: number;
   status: OrderStatus;
-  margin: string;
-  leverage: string;
   createdAt: number;
 };
-
 export type Fill = {
   id: string;
   marketId: string;
@@ -32,30 +31,29 @@ export type Fill = {
   takerOrderId: string;
   makerUserId: string;
   takerUserId: string;
-  price: string;
-  qty: string;
+  price: number;
+  qty: number;
   createdAt: number;
 };
-
 export type Position = {
   userId: string;
   marketId: string;
   side: PositionSide;
-  qty: string;
-  entryPrice: string;
-  margin: string;
-  leverage: string;
-  realizedPnl: string;
+  qty: number;
+  entryPrice: number;
+  margin: number;
+  leverage: number;
+  realizedPnl: number;
   updatedAt: number;
 };
 
 export type UserBalance = {
   userId: string;
-  available: string;
-  locked: string;
+  available: number;
+  locked: number;
 };
 
-export type DepthLevel = [price: string, qty: string];
+export type DepthLevel = [price: number, qty: number];
 
 export type Depth = {
   marketId: string;
@@ -72,10 +70,10 @@ export type EngineRequest =
         marketId: string;
         side: Side;
         orderType: OrderType;
-        price?: string;
-        qty: string;
-        margin: string;
-        leverage: string;
+        price?: number;
+        qty: number;
+        margin: number;
+        leverage: number;
       };
     }
   | {
@@ -113,7 +111,7 @@ export type EngineRequest =
       requestId: string;
       payload: {
         userId: string;
-        amount: string;
+        amount: number;
       };
     };
 

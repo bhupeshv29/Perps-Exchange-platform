@@ -15,7 +15,7 @@
     "db:migrate": "prisma migrate dev"
   },
   "exports": {
-    "./client": "./index.js"
+    ".": "./index.ts"
   },
   "peerDependencies": {
     "typescript": "^6.0.3"
