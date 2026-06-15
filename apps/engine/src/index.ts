@@ -66,7 +66,7 @@ async function startEngine() {
               await publishResponse(response);
               break;
             }
-              
+
             case "CREATE_ORDER": {
               const response = await processCreateOrder(request);
               await publishResponse(response);

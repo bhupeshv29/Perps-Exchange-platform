@@ -16,7 +16,7 @@ export function getOrCreateOrderbook(marketId: string): Orderbook {
 
 export function addOrderToBook(order: Order) {
   const book = getOrCreateOrderbook(order.marketId);
-  const sideBook = order.side === "BUY" ? book.bids : book.asks;
+  const sideBook = order.side === "BID" ? book.bids : book.asks;
 
   if (!order.price) {
     throw new Error("limit order price is required");

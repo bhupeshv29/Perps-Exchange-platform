@@ -3,8 +3,13 @@ import { randomUUID } from "crypto";
 import type { EngineRequest, EngineResponse, Order } from "@repo/common";
 
 import { balances, orders } from "../state/state";
+import {
+  addOrderToBook,
+  getOrCreateOrderbook,
+  updateOrderStatus,
+} from "../orderbook/orderbook";
+import {matchAsk, matchBid} from "../orderbook/match"
 
-import { addOrderToBook } from "../orderbook/orderbook";
 
 export async function processCreateOrder(
   request: Extract<EngineRequest, { type: "CREATE_ORDER" }>,
@@ -30,6 +35,14 @@ export async function processCreateOrder(
     };
   }
 
+  if (orderType === "LIMIT" && price === undefined) {
+    return {
+      type: "ORDER_REJECTED",
+      requestId: request.requestId,
+      error: "limit order price is required",
+    };
+  }
+
   balance.available -= margin;
   balance.locked += margin;
 
@@ -50,7 +63,15 @@ export async function processCreateOrder(
 
   orders[order.id] = order;
 
-  if (order.type === "LIMIT") {
+  const book = getOrCreateOrderbook(marketId);
+
+  const fills = side === "BID" ? matchBid(book, order) : matchAsk(book, order);
+
+  updateOrderStatus(order);
+
+  const remainingQty = order.qty - order.filledQty;
+
+  if (remainingQty > 0 && order.type === "LIMIT") {
     addOrderToBook(order);
   }
 
@@ -59,7 +80,7 @@ export async function processCreateOrder(
     requestId: request.requestId,
     payload: {
       order,
-      fills: [],
+      fills,
     },
   };
 }

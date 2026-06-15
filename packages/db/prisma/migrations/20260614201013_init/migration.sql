@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "OrderSide" AS ENUM ('BUY', 'SELL');
+CREATE TYPE "OrderSide" AS ENUM ('BID', 'ASK');
 
 -- CreateEnum
 CREATE TYPE "OrderType" AS ENUM ('LIMIT', 'MARKET');

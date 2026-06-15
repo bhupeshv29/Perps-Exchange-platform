@@ -1,4 +1,4 @@
-export type Side = "BUY" | "SELL";
+export type Side = "BID" | "ASK";
 export type OrderType = "LIMIT" | "MARKET";
 
 export type OrderStatus =

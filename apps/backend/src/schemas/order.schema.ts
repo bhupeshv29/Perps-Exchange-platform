@@ -3,7 +3,7 @@ import { DEFAULT_LEVERAGE } from "@repo/common";
 
 export const createOrderSchema = z.object({
   marketId: z.string().min(1),
-  side: z.enum(["BUY", "SELL"]),
+  side: z.enum(["BID", "ASK"]),
   orderType: z.enum(["LIMIT", "MARKET"]),
   price: z.coerce.number().int().positive().optional(),
   qty: z.coerce.number().int().positive(),

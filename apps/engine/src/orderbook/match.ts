@@ -9,7 +9,7 @@ import {
 
 import type { Orderbook } from "./types";
 
-export function matchBuy(book: Orderbook, order: Order): Fill[] {
+export function matchBid(book: Orderbook, order: Order): Fill[] {
   const fills: Fill[] = [];
 
   while (order.filledQty < order.qty) {
@@ -17,7 +17,7 @@ export function matchBuy(book: Orderbook, order: Order): Fill[] {
     if (bestAskPrice === null) {
       break;
     }
-    //buy price >= ask price
+    //Bid price >= ask price
     if (order.type === "LIMIT" && order.price! < bestAskPrice) {
       break;
     }
@@ -34,9 +34,9 @@ export function matchBuy(book: Orderbook, order: Order): Fill[] {
       break;
     }
     //remaining Qty
-    const remainingBuyQty = order.qty - order.filledQty;
-    const remainingSellQty = makerOrder.qty - makerOrder.filledQty;
-    const fillQty = Math.min(remainingBuyQty, remainingSellQty);
+    const remainingBidQty = order.qty - order.filledQty;
+    const remainingAskQty = makerOrder.qty - makerOrder.filledQty;
+    const fillQty = Math.min(remainingBidQty, remainingAskQty);
 
     //update order
     order.filledQty += fillQty;
@@ -70,7 +70,7 @@ export function matchBuy(book: Orderbook, order: Order): Fill[] {
 
 //price time priority (FIFO)
 
-export function matchSell(book: Orderbook, order: Order): Fill[] {
+export function matchAsk(book: Orderbook, order: Order): Fill[] {
   const fills: Fill[] = [];
 
   while (order.filledQty < order.qty) {
@@ -96,9 +96,9 @@ export function matchSell(book: Orderbook, order: Order): Fill[] {
       break;
     }
 
-    const remainingSellQty = order.qty - order.filledQty;
-    const remainingBuyQty = makerOrder.qty - makerOrder.filledQty;
-    const fillQty = Math.min(remainingSellQty, remainingBuyQty);
+    const remainingAskQty = order.qty - order.filledQty;
+    const remainingBidQty = makerOrder.qty - makerOrder.filledQty;
+    const fillQty = Math.min(remainingAskQty, remainingBidQty);
 
     order.filledQty += fillQty;
     makerOrder.filledQty += fillQty;
