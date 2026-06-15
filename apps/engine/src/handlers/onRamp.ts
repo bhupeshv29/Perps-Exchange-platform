@@ -1,5 +1,6 @@
 import type { EngineRequest, EngineResponse } from "@repo/common";
 import { balances } from "../state/state";
+import { publishDbEvent, publishWsEvent } from "../publish/events";
 
 export async function processOnRamp(
   request: Extract<EngineRequest, { type: "ON_RAMP" }>,
@@ -13,8 +14,20 @@ export async function processOnRamp(
   };
 
   balance.available += amount;
-
   balances[userId] = balance;
+
+  await publishDbEvent({
+    type: "BALANCE_UPDATED",
+    payload: balance,
+    createdAt: Date.now(),
+  });
+
+  await publishWsEvent({
+    type: "BALANCE_UPDATE",
+    userId,
+    payload: balance,
+    createdAt: Date.now(),
+  });
 
   return {
     type: "ON_RAMP_SUCCESS",

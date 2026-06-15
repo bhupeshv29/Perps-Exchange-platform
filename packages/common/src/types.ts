@@ -230,7 +230,7 @@ export type WsEvent =
       type: "MARK_PRICE_UPDATE";
       marketId: string;
       payload: {
-        price: string;
+        price: number;
       };
       createdAt: number;
     };
