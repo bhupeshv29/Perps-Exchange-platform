@@ -1,0 +1,21 @@
+{
+  "name": "wsgateway",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/ws": "latest",
+    "@types/jsonwebtoken": "latest"
+  },
+  "scripts": {
+    "dev": "bun --watch src/index.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5",
+    "@repo/common": "workspace:*",
+    "@repo/redis": "workspace:*",
+    "ws": "latest",
+    "jsonwebtoken": "latest"
+  }
+}
