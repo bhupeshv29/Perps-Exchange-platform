@@ -94,7 +94,7 @@ export async function processCreateOrder(
 
   updateOrderStatus(order);
 
-  applyFillsToPositions(fills);
+  const positionResult = applyFillsToPositions(fills);
 
   const remainingQty = order.qty - order.filledQty;
 
@@ -111,6 +111,26 @@ export async function processCreateOrder(
       await publishDbEvent({
         type: "ORDER_UPDATED",
         payload: order,
+        createdAt: Date.now(),
+      });
+
+      await publishDbEvent({
+        type: "BALANCE_UPDATED",
+        payload: balance,
+        createdAt: Date.now(),
+      });
+
+      await publishWsEvent({
+        type: "ORDER_UPDATE",
+        userId,
+        payload: order,
+        createdAt: Date.now(),
+      });
+
+      await publishWsEvent({
+        type: "BALANCE_UPDATE",
+        userId,
+        payload: balance,
         createdAt: Date.now(),
       });
 
@@ -137,9 +157,30 @@ export async function processCreateOrder(
     });
   }
 
+  for (const position of positionResult.updatedPositions) {
+    await publishDbEvent({
+      type: "POSITION_UPDATED",
+      payload: position,
+      createdAt: Date.now(),
+    });
+
+    await publishWsEvent({
+      type: "POSITION_UPDATE",
+      userId: position.userId,
+      payload: position,
+      createdAt: Date.now(),
+    });
+  }
+
   await publishDbEvent({
     type: "ORDER_UPDATED",
     payload: order,
+    createdAt: Date.now(),
+  });
+
+  await publishDbEvent({
+    type: "BALANCE_UPDATED",
+    payload: balance,
     createdAt: Date.now(),
   });
 
