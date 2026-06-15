@@ -1,6 +1,6 @@
 import { Router } from "express";
 import bcrypt from "bcryptjs";
-import { prisma } from "@repo/db/client";
+import { prisma } from "@repo/db";
 import { signupSchema, signinSchema } from "../schemas/auth.schema";
 import { validateBody } from "../middleware/validate";
 import { signToken } from "../services/jwt";
