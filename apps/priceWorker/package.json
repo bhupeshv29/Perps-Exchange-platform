@@ -1,0 +1,14 @@
+{
+  "name": "priceworker",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5",
+    "@repo/common": "workspace:*",
+    "@repo/redis": "workspace:*"
+  }
+}
