@@ -54,6 +54,11 @@ export async function processCancelOrder(
     payload: order,
     createdAt: Date.now(),
   });
+  await publishDbEvent({
+    type: "BALANCE_UPDATED",
+    payload: balance!,
+    createdAt: Date.now(),
+  });
 
   await publishWsEvent({
     type: "ORDER_UPDATE",

@@ -47,6 +47,26 @@ export type Position = {
   updatedAt: number;
 };
 
+export type ClosedPosition = {
+  userId: string;
+  marketId: string;
+
+  side: PositionSide;
+
+  qty: number;
+
+  entryPrice: number;
+  exitPrice: number;
+
+  margin: number;
+  leverage: number;
+
+  realizedPnl: number;
+
+  openedAt: number;
+  closedAt: number;
+};
+
 export type UserBalance = {
   userId: string;
   available: number;
@@ -191,6 +211,11 @@ export type DbEvent =
       type: "BALANCE_UPDATED";
       payload: UserBalance;
       createdAt: number;
+    }
+  | {
+      type: "CLOSED_POSITION_CREATED";
+      payload: ClosedPosition;
+      createdAt: number;
     };
 
 export type DbEventType = DbEvent["type"];
@@ -200,6 +225,17 @@ export type WsEvent =
       type: "DEPTH_UPDATE";
       marketId: string;
       payload: Depth;
+      createdAt: number;
+    }
+  | {
+      type: "POSITION_LIQUIDATED";
+      userId: string;
+      payload: {
+        marketId: string;
+        side: PositionSide;
+        qty: number;
+        price: number;
+      };
       createdAt: number;
     }
   | {
@@ -236,3 +272,9 @@ export type WsEvent =
     };
 
 export type WsEventType = WsEvent["type"];
+
+export type MarkPriceUpdate = {
+  marketId: string;
+  price: number;
+  createdAt: number;
+};

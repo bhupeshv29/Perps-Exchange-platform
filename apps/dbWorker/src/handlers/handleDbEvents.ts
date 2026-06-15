@@ -119,5 +119,33 @@ export async function handleDbEvent(event: DbEvent) {
 
       return;
     }
+
+    case "CLOSED_POSITION_CREATED": {
+      const position = event.payload;
+
+      await prisma.closedPosition.create({
+        data: {
+          userId: position.userId,
+          marketId: position.marketId,
+
+          side: position.side,
+
+          qty: position.qty,
+
+          entryPrice: position.entryPrice,
+          exitPrice: position.exitPrice,
+
+          margin: position.margin,
+          leverage: position.leverage,
+
+          realizedPnl: position.realizedPnl,
+
+          openedAt: new Date(position.openedAt),
+          closedAt: new Date(position.closedAt),
+        },
+      });
+
+      return;
+    }
   }
 }

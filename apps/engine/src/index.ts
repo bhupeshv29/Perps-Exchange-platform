@@ -132,7 +132,7 @@ async function startPriceConsumer() {
 
 async function startEngine() {
   await connectRedis();
-
+  startPriceConsumer().catch(console.error);
   await createConsumerGroup(redis, STREAMS.ENGINE_REQUESTS, GROUPS.ENGINE);
   await createConsumerGroup(redis, STREAMS.PRICE_UPDATES, GROUPS.ENGINE);
 

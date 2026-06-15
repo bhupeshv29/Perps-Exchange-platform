@@ -62,3 +62,59 @@ accountRouter.get("/positions", requireAuth, async (req: AuthRequest, res) => {
     });
   }
 });
+
+accountRouter.get(
+  "/closed-positions",
+  requireAuth,
+  async (req: AuthRequest, res) => {
+    const positions = await prisma.closedPosition.findMany({
+      where: {
+        userId: req.userId!,
+      },
+      orderBy: {
+        closedAt: "desc",
+      },
+    });
+
+    return res.json({
+      positions,
+    });
+  },
+);
+
+accountRouter.get("/orders", requireAuth, async (req: AuthRequest, res) => {
+  const orders = await prisma.order.findMany({
+    where: {
+      userId: req.userId!,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return res.json({
+    orders,
+  });
+});
+
+accountRouter.get("/fills", requireAuth, async (req: AuthRequest, res) => {
+  const fills = await prisma.fill.findMany({
+    where: {
+      OR: [
+        {
+          makerUserId: req.userId!,
+        },
+        {
+          takerUserId: req.userId!,
+        },
+      ],
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return res.json({
+    fills,
+  });
+});
