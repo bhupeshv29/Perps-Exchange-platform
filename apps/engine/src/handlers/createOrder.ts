@@ -8,8 +8,25 @@ import {
   getOrCreateOrderbook,
   updateOrderStatus,
 } from "../orderbook/orderbook";
-import {matchAsk, matchBid} from "../orderbook/match"
+import { matchAsk, matchBid } from "../orderbook/match";
+import {
+  applyFillsToPositions,
+  getProportionalMargin,
+} from "../position/position";
 
+function releaseUnfilledMargin(order: Order) {
+  const balance = balances[order.userId];
+
+  if (!balance) return;
+
+  const filledMargin = getProportionalMargin(order, order.filledQty);
+  const unusedMargin = order.margin - filledMargin;
+
+  if (unusedMargin <= 0) return;
+
+  balance.locked -= unusedMargin;
+  balance.available += unusedMargin;
+}
 
 export async function processCreateOrder(
   request: Extract<EngineRequest, { type: "CREATE_ORDER" }>,
@@ -69,10 +86,26 @@ export async function processCreateOrder(
 
   updateOrderStatus(order);
 
+  applyFillsToPositions(fills);
+
   const remainingQty = order.qty - order.filledQty;
 
   if (remainingQty > 0 && order.type === "LIMIT") {
     addOrderToBook(order);
+  }
+
+  if (remainingQty > 0 && order.type === "MARKET") {
+    releaseUnfilledMargin(order);
+
+    if (order.filledQty === 0) {
+      order.status = "REJECTED";
+
+      return {
+        type: "ORDER_REJECTED",
+        requestId: request.requestId,
+        error: "market order could not be filled",
+      };
+    }
   }
 
   return {

@@ -106,3 +106,22 @@ export function getBestBidPrice(book: Orderbook): number | null {
 
   return Math.max(...prices);
 }
+
+export function removeOrderFromBook(order: Order) {
+  if (!order.price) return;
+
+  const book = getOrCreateOrderbook(order.marketId);
+  const sideBook = order.side === "BID" ? book.bids : book.asks;
+  const ordersAtPrice = sideBook[order.price];
+
+  if (!ordersAtPrice) return;
+
+  const remainingOrders = ordersAtPrice.filter((o) => o.id !== order.id);
+
+  if (remainingOrders.length === 0) {
+    delete sideBook[order.price];
+    return;
+  }
+
+  sideBook[order.price] = remainingOrders;
+}

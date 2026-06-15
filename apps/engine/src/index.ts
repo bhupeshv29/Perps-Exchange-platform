@@ -15,6 +15,8 @@ import { publishResponse } from "./publish/publish";
 import { processGetPositions } from "./handlers/getPositions";
 import { processGetBalance } from "./handlers/getBalance";
 import { processCreateOrder } from "./handlers/createOrder";
+import { processGetDepth } from "./handlers/getDepth";
+import { processCancelOrder } from "./handlers/cancelOrder";
 
 async function startEngine() {
   await connectRedis();
@@ -69,6 +71,22 @@ async function startEngine() {
 
             case "CREATE_ORDER": {
               const response = await processCreateOrder(request);
+              await publishResponse(response);
+              break;
+            }
+            case "GET_DEPTH": {
+              const response = await processGetDepth(request);
+              await publishResponse(response);
+              break;
+            }
+            case "GET_DEPTH": {
+              const response = await processGetDepth(request);
+              await publishResponse(response);
+              break;
+            }
+
+            case "CANCEL_ORDER": {
+              const response = await processCancelOrder(request);
               await publishResponse(response);
               break;
             }
