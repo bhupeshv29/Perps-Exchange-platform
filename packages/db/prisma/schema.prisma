@@ -3,7 +3,6 @@
 
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -51,9 +50,9 @@ model User {
 }
 
 model Balance {
-  userId    String  @id
-  available Decimal @default(0)
-  locked    Decimal @default(0)
+  userId    String @id
+  available Int    @default(0)
+  locked    Int    @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -81,11 +80,11 @@ model Order {
   side      OrderSide
   type      OrderType
   status    OrderStatus @default(OPEN)
-  price     Decimal?
-  qty       Decimal
-  filledQty Decimal     @default(0)
-  margin    Decimal
-  leverage  Decimal
+  price     Int?
+  qty       Int
+  filledQty Int         @default(0)
+  margin    Int
+  leverage  Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -102,14 +101,14 @@ model Order {
 }
 
 model Fill {
-  id           String  @id
+  id           String @id
   marketId     String
   makerOrderId String
   takerOrderId String
   makerUserId  String
   takerUserId  String
-  price        Decimal
-  qty          Decimal
+  price        Int
+  qty          Int
 
   createdAt DateTime @default(now())
 
@@ -129,11 +128,11 @@ model Position {
   userId      String
   marketId    String
   side        PositionSide
-  qty         Decimal
-  entryPrice  Decimal
-  margin      Decimal
-  leverage    Decimal
-  realizedPnl Decimal      @default(0)
+  qty         Int
+  entryPrice  Int
+  margin      Int
+  leverage    Int
+  realizedPnl Int          @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -151,12 +150,12 @@ model ClosedPosition {
   userId      String
   marketId    String
   side        PositionSide
-  qty         Decimal
-  entryPrice  Decimal
-  exitPrice   Decimal
-  margin      Decimal
-  leverage    Decimal
-  realizedPnl Decimal
+  qty         Int
+  entryPrice  Int
+  exitPrice   Int
+  margin      Int
+  leverage    Int
+  realizedPnl Int
   openedAt    DateTime
   closedAt    DateTime     @default(now())
 
