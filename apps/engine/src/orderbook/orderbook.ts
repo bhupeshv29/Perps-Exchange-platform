@@ -65,6 +65,10 @@ export function removeFilledOrdersFromBook(book: Orderbook) {
   }
 }
 
+//** 
+// this is for depth calculation for fe
+// 
+// */
 function aggregateSide(sideBook: Record<number, Order[]>): [number, number][] {
   return Object.entries(sideBook)
     .map(([price, orders]) => {

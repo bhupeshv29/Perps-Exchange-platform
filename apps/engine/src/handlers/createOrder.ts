@@ -38,6 +38,24 @@ export async function processCreateOrder(
 
   const balance = balances[userId];
 
+  const market = getMarketConfig(marketId);
+
+  if (!market || !market.isActive) {
+    return {
+      type: "ORDER_REJECTED",
+      requestId: request.requestId,
+      error: "invalid market",
+    };
+  }
+
+  if (leverage > market.maxLeverage) {
+    return {
+      type: "ORDER_REJECTED",
+      requestId: request.requestId,
+      error: "leverage too high for market",
+    };
+  }
+
   if (!balance) {
     return {
       type: "ORDER_REJECTED",
