@@ -3,7 +3,7 @@ import { requireAuth, type AuthRequest } from "../middleware/auth";
 import { validateBody } from "../middleware/validate";
 import { createOrderSchema, cancelOrderSchema } from "../schemas/order.schema";
 import { sendToEngine } from "../services/loopback";
-import { scaleMargin, scalePrice, scaleQty } from "../utils/scaling";
+import {  scaleBalance, scalePrice, scaleQty } from "../utils/scaling";
 
 export const orderRouter = Router();
 
@@ -27,7 +27,7 @@ orderRouter.post(
               ? undefined
               : scalePrice(body.marketId, body.price),
           qty: scaleQty(body.marketId, body.qty),
-          margin: scaleMargin(body.marketId, body.margin),
+          margin: scaleBalance( body.margin),
           leverage: body.leverage,
         },
       });

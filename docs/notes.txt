@@ -3,20 +3,20 @@ ws
     depth
     trades
     mark price
-    
+
     private authenticated:
     my orders
     my positions
     my balance
 
 //todo
- - script re write for all 
- - root end 
+ - script re write for all
+ - root end
  - dockerise each package
- - 
- 
+ -
 
-//optional 
+
+//optional
     - repo codebase setup (database)
     - common response function
     - status library
@@ -61,8 +61,8 @@ testing.
 
 
 testing(postman) ->
-    
-    
+
+
 
 
 
@@ -85,19 +85,19 @@ Quick rule
 
 
 
-i should normlly. 
+i should normlly.
 convert decimal to int in api layer
 
 
 
-work to do now 
+work to do now
     decimal to number at api
-    remove db 
+    remove db
     remove ws
     complete backend to engine
     move market in engine from package
 
-make conversion into small fn 
+make conversion into small fn
 
 
 
@@ -134,3 +134,23 @@ apps/engine/src/snapshot/
 ✔ Snapshots
 ✔ Websocket Updates
 ✔ Persistence
+
+just-testing
+    1. packages/common
+    2. packages/redis
+    3. packages/db
+    4. apps/backend
+    5. apps/engine
+    6. apps/dbWorker
+    7. apps/wsGateway
+    8. apps/priceWorker
+
+1. Do not keep market registry in common if you decided engine owns markets.
+2. PRICE_SCALE / QTY_SCALE in common are not needed if backend handles scaling.
+3. WS events currently send integer ticks. That is okay only if frontend unscales WS payloads too.
+
+
+
+backend/ wrap in trycatch in onramp
+
+

@@ -5,8 +5,8 @@ import { validateBody } from "../middleware/validate";
 import { onRampSchema } from "../schemas/order.schema";
 import { sendToEngine } from "../services/loopback";
 import {
-  scaleMargin,
-  unscaleMargin,
+  scaleBalance,
+  unscaleBalance,
   unscalePrice,
   unscaleQty,
 } from "../utils/scaling";
@@ -22,11 +22,20 @@ accountRouter.post(
       type: "ON_RAMP",
       payload: {
         userId: req.userId!,
-        amount: scaleMargin("BTCUSDT", req.body.amount),
+        amount: scaleBalance(req.body.amount),
       },
     });
 
-    return res.json(response);
+    if (response.type !== "ON_RAMP_SUCCESS") return res.json(response);
+
+    return res.json({
+      ...response,
+      payload: {
+        ...response.payload,
+        available: unscaleBalance(response.payload.available),
+        locked: unscaleBalance(response.payload.locked),
+      },
+    });
   },
 );
 
@@ -42,8 +51,8 @@ accountRouter.get("/balance", requireAuth, async (req: AuthRequest, res) => {
     ...response,
     payload: {
       ...response.payload,
-      available: unscaleMargin("BTCUSDT", response.payload.available),
-      locked: unscaleMargin("BTCUSDT", response.payload.locked),
+      available: unscaleBalance(response.payload.available),
+      locked: unscaleBalance(response.payload.locked),
     },
   });
 });
@@ -62,8 +71,8 @@ accountRouter.get("/positions", requireAuth, async (req: AuthRequest, res) => {
       ...p,
       qty: unscaleQty(p.marketId, p.qty),
       entryPrice: unscalePrice(p.marketId, p.entryPrice),
-      margin: unscaleMargin(p.marketId, p.margin),
-      realizedPnl: unscaleMargin(p.marketId, p.realizedPnl),
+      margin: unscaleBalance(p.margin),
+      realizedPnl: unscaleBalance(p.realizedPnl),
     })),
   });
 });
@@ -80,7 +89,7 @@ accountRouter.get("/orders", requireAuth, async (req: AuthRequest, res) => {
       price: o.price === null ? null : unscalePrice(o.marketId, o.price),
       qty: unscaleQty(o.marketId, o.qty),
       filledQty: unscaleQty(o.marketId, o.filledQty),
-      margin: unscaleMargin(o.marketId, o.margin),
+      margin: unscaleBalance(o.margin),
     })),
   });
 });
@@ -117,8 +126,8 @@ accountRouter.get(
         qty: unscaleQty(p.marketId, p.qty),
         entryPrice: unscalePrice(p.marketId, p.entryPrice),
         exitPrice: unscalePrice(p.marketId, p.exitPrice),
-        margin: unscaleMargin(p.marketId, p.margin),
-        realizedPnl: unscaleMargin(p.marketId, p.realizedPnl),
+        margin: unscaleBalance(p.margin),
+        realizedPnl: unscaleBalance(p.realizedPnl),
       })),
     });
   },
