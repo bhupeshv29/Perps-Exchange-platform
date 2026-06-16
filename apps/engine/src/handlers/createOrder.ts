@@ -1,6 +1,6 @@
 import { randomUUID } from "crypto";
 
-import type { EngineRequest, EngineResponse, Order } from "@repo/common";
+import { getMarketConfig, type EngineRequest, type EngineResponse, type Order } from "@repo/common";
 
 import { balances, orders } from "../state/state";
 import {
