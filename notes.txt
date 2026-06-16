@@ -1,0 +1,99 @@
+ws
+    public:
+    depth
+    trades
+    mark price
+    
+    private authenticated:
+    my orders
+    my positions
+    my balance
+
+//todo
+ - script re write for all 
+ - root end 
+ - dockerise each package
+ - 
+ 
+
+//optional 
+    - repo codebase setup (database)
+    - common response function
+    - status library
+    - integer ticks
+            number
+                ↓
+            working exchange
+                ↓
+            integer ticks
+                ↓
+            production-grade precision
+
+
+
+production exchange
+    TreeMap
+    Heap
+    Sorted Set
+    RB Tree
+    Skip List
+
+how to ensure only market created by admin will be traded
+
+depth should deltas, and also oderbook is not shorted i think cause it is just using min/max fn
+
+
+For browser cookie auth later, we’ll parse the cookie from the WS upgrade request. For now, send token via AUTH message.
+
+//Engine = source of truth for active markets
+DB = persistence/read history
+Admin route = later, sends MARKET_CREATE command to engine
+
+Engine Recovery + // snapshot
+candles
+
+testing.
+
+
+
+
+
+
+
+testing(postman) ->
+    
+    
+
+
+
+
+//notes
+Three prices you'll usually see
+Last Price
+    The price of the most recent trade.
+    Used for charting and order execution.
+Mark Price
+    Fair-value price used for PnL and liquidation.
+    Usually smoother than the last price.
+Index Price
+    A weighted average of spot prices from multiple exchanges.
+    One of the inputs used to calculate the mark price.
+Quick rule
+        Orders execute at the market/last price.
+        Liquidation happens based on the mark price.
+        Unrealized PnL is usually calculated using the mark price.
+
+
+
+i should normlly. 
+convert decimal to int in api layer
+
+
+
+work to do now 
+    decimal to number at api
+    remove db 
+    remove ws
+    complete backend to engine
+
+

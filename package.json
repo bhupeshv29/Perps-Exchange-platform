@@ -11,9 +11,9 @@
     "db:migrate": "bun --filter @repo/db db:migrate",
     "dev:backend": "bun --filter backend dev",
     "dev:engine": "bun --filter engine dev",
-    "dev:db-worker": "bun --filter db-worker dev",
-    "dev:ws": "bun --filter ws-gateway dev",
-    "dev:price-worker": "bun --filter price-worker dev"
+    "dev:db-worker": "bun --filter dbWorker dev",
+    "dev:ws": "bun --filter wsGateway dev",
+    "dev:price-worker": "bun --filter priceWorker dev"
   },
   "devDependencies": {
     "prettier": "^3.7.4",
