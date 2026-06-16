@@ -153,4 +153,10 @@ just-testing
 
 backend/ wrap in trycatch in onramp
 
+After refactoring files, I’d revisit the liquidation math because that’s where exchange correctness matters most.
 
+
+funding Rate
+they all go into processPriceUpdate() instead of bloating the consumer.
+
+check api or engine market registry be same otherwise move in common package
