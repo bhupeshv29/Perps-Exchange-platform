@@ -66,39 +66,6 @@ export async function handleDbEvent(event: DbEvent) {
       return;
     }
 
-    case "POSITION_UPDATED": {
-      const position = event.payload;
-
-      await prisma.position.upsert({
-        where: {
-          userId_marketId_side: {
-            userId: position.userId,
-            marketId: position.marketId,
-            side: position.side,
-          },
-        },
-        update: {
-          qty: position.qty,
-          entryPrice: position.entryPrice,
-          margin: position.margin,
-          leverage: position.leverage,
-          realizedPnl: position.realizedPnl,
-        },
-        create: {
-          userId: position.userId,
-          marketId: position.marketId,
-          side: position.side,
-          qty: position.qty,
-          entryPrice: position.entryPrice,
-          margin: position.margin,
-          leverage: position.leverage,
-          realizedPnl: position.realizedPnl,
-        },
-      });
-
-      return;
-    }
-
     case "BALANCE_UPDATED": {
       const balance = event.payload;
 

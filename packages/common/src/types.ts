@@ -203,11 +203,6 @@ export type DbEvent =
       createdAt: number;
     }
   | {
-      type: "POSITION_UPDATED";
-      payload: Position;
-      createdAt: number;
-    }
-  | {
       type: "BALANCE_UPDATED";
       payload: UserBalance;
       createdAt: number;
