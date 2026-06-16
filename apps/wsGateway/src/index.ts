@@ -28,8 +28,9 @@ function parseCookies(cookieHeader?: string): Record<string, string> {
     return {};
   }
 
-  return cookieHeader.split(";").reduce<Record<string, string>>(
-    (acc, cookie) => {
+  return cookieHeader
+    .split(";")
+    .reduce<Record<string, string>>((acc, cookie) => {
       const [key, ...value] = cookie.trim().split("=");
 
       if (!key) {
@@ -39,14 +40,10 @@ function parseCookies(cookieHeader?: string): Record<string, string> {
       acc[key] = decodeURIComponent(value.join("="));
 
       return acc;
-    },
-    {},
-  );
+    }, {});
 }
 
-function getUserIdFromCookie(
-  cookieHeader?: string,
-): string | undefined {
+function getUserIdFromCookie(cookieHeader?: string): string | undefined {
   const cookies = parseCookies(cookieHeader);
 
   const token = cookies.token;
@@ -112,10 +109,7 @@ wss.on("connection", (ws, req) => {
   });
 });
 
-function sendToClient(
-  client: Client,
-  event: WsEvent,
-) {
+function sendToClient(client: Client, event: WsEvent) {
   if (client.ws.readyState !== WebSocket.OPEN) {
     return;
   }
@@ -123,9 +117,7 @@ function sendToClient(
   client.ws.send(JSON.stringify(event));
 }
 
-function isPrivateEvent(
-  event: WsEvent,
-): event is PrivateWsEvent {
+function isPrivateEvent(event: WsEvent): event is PrivateWsEvent {
   return "userId" in event;
 }
 
@@ -158,30 +150,21 @@ function broadcastEvent(event: WsEvent) {
 async function main() {
   await connectRedis();
 
-  await redis.subscribe(
-    CHANNELS.WS_EVENTS,
-    (raw) => {
-      try {
-        const event = JSON.parse(raw) as WsEvent;
+  await redis.subscribe(CHANNELS.WS_EVENTS, (raw) => {
+    try {
+      const event = JSON.parse(raw) as WsEvent;
 
-        broadcastEvent(event);
-      } catch (error) {
-        console.error(
-          "failed to parse ws event",
-          error,
-        );
-      }
-    },
-  );
+      broadcastEvent(event);
+    } catch (error) {
+      console.error("failed to parse ws event", error);
+    }
+  });
 
   console.log("ws-gateway running on port 3002");
 }
 
 main().catch((error) => {
-  console.error(
-    "ws-gateway startup failed",
-    error,
-  );
+  console.error("ws-gateway startup failed", error);
 
   process.exit(1);
 });

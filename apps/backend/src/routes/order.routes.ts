@@ -1,9 +1,15 @@
 import { Router } from "express";
+
 import { requireAuth, type AuthRequest } from "../middleware/auth";
 import { validateBody } from "../middleware/validate";
+
 import { createOrderSchema, cancelOrderSchema } from "../schemas/order.schema";
+
 import { sendToEngine } from "../services/loopback";
-import {  scaleBalance, scalePrice, scaleQty } from "../utils/scaling";
+
+import { scaleBalance, scalePrice, scaleQty } from "../utils/scaling";
+
+import { unscaleOrder, unscaleFill } from "../utils/unscale";
 
 export const orderRouter = Router();
 
@@ -27,16 +33,22 @@ orderRouter.post(
               ? undefined
               : scalePrice(body.marketId, body.price),
           qty: scaleQty(body.marketId, body.qty),
-          margin: scaleBalance( body.margin),
+          margin: scaleBalance(body.margin),
           leverage: body.leverage,
         },
       });
 
-      if (response.type === "ORDER_REJECTED" || response.type === "ERROR") {
+      if (response.type !== "ORDER_ACCEPTED") {
         return res.status(400).json(response);
       }
 
-      return res.status(201).json(response);
+      return res.status(201).json({
+        ...response,
+        payload: {
+          order: unscaleOrder(response.payload.order),
+          fills: response.payload.fills.map(unscaleFill),
+        },
+      });
     } catch (error) {
       return res.status(504).json({
         message: error instanceof Error ? error.message : "Engine timeout",

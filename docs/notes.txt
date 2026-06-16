@@ -1,6 +1,6 @@
 ws
     public:
-    depth
+    depth (in futures send deltas)
     trades
     mark price
 
@@ -11,7 +11,7 @@ ws
 
 //todo
  - script re write for all
- - root end
+ - root env
  - dockerise each package
  -
 
@@ -20,7 +20,7 @@ ws
     - repo codebase setup (database)
     - common response function
     - status library
-    - integer ticks
+    - integer ticks     ✅
             number
                 ↓
             working exchange
@@ -38,7 +38,7 @@ production exchange
     RB Tree
     Skip List
 
-how to ensure only market created by admin will be traded
+how to ensure only market created by admin will be traded (not implementing it)
 
 depth should deltas, and also oderbook is not shorted i think cause it is just using min/max fn
 
@@ -55,16 +55,7 @@ candles
 testing.
 
 
-
-
-
-
-
 testing(postman) ->
-
-
-
-
 
 
 //notes
@@ -86,21 +77,20 @@ Quick rule
 
 
 i should normlly.
-convert decimal to int in api layer
+convert decimal to int in api layer    ✅
 
 
 
 work to do now
-    decimal to number at api
-    remove db
-    remove ws
-    complete backend to engine
-    move market in engine from package
+    decimal to number at api    ✅
+    remove db    ✅
+    remove ws    ✅
+    complete backend to engine    ✅
+    move market in engine from package✅
 
-make conversion into small fn
+make conversion into small fn ✅
 
-
-
+(just for knowledge) ->
 Funding Rate
 Cross Margin
 Isolated Margin
@@ -119,11 +109,11 @@ KYC
 Deposits/Withdrawals
 
 
-Snapshot Engine State
+Snapshot Engine State✅
 
-apps/engine/src/snapshot/
-    saveSnapshot.ts
-    loadSnapshot.ts
+apps/engine/src/snapshot/✅
+    saveSnapshot.ts✅
+    loadSnapshot.ts✅
 
 
 ✔ Orderbook
@@ -135,20 +125,9 @@ apps/engine/src/snapshot/
 ✔ Websocket Updates
 ✔ Persistence
 
-just-testing
-    1. packages/common
-    2. packages/redis
-    3. packages/db
-    4. apps/backend
-    5. apps/engine
-    6. apps/dbWorker
-    7. apps/wsGateway
-    8. apps/priceWorker
 
-1. Do not keep market registry in common if you decided engine owns markets.
-2. PRICE_SCALE / QTY_SCALE in common are not needed if backend handles scaling.
+
 3. WS events currently send integer ticks. That is okay only if frontend unscales WS payloads too.
-
 
 
 backend/ wrap in trycatch in onramp
@@ -156,7 +135,36 @@ backend/ wrap in trycatch in onramp
 After refactoring files, I’d revisit the liquidation math because that’s where exchange correctness matters most.
 
 
-funding Rate
-they all go into processPriceUpdate() instead of bloating the consumer.
+( funding Rate
+    they all go into processPriceUpdate() instead of bloating the consumer.)
 
 check api or engine market registry be same otherwise move in common package
+
+will margin be calculated from leverage or price x quantity
+
+
+
+again postman testing (17 june)
+
+{
+    "type": "ORDER_ACCEPTED",
+    "requestId": "996c2f3a-92f7-49af-a6bc-a7de8c770e12",
+    "payload": {
+        "order": {
+            "id": "2dc923e8-cbb4-41d4-8682-c594028cf298",
+            "userId": "f3257764-1e52-44bd-ad6a-d06312423f44",
+            "marketId": "BTCUSDT",
+            "side": "BID",
+            "type": "LIMIT",
+            "price": 100000,
+            "qty": 1000,
+            "filledQty": 0,
+            "margin": 100000,
+            "leverage": 1,
+            "status": "OPEN",
+            "createdAt": 1781646262281
+        },
+        "fills": []
+    }
+}
+should reponse be unscaling ✅
