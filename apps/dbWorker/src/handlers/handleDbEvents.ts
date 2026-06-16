@@ -6,8 +6,23 @@ export async function handleDbEvent(event: DbEvent) {
     case "ORDER_CREATED": {
       const order = event.payload;
 
-      await prisma.order.create({
-        data: {
+      await prisma.order.upsert({
+        where: {
+          id: order.id,
+        },
+        update: {
+          userId: order.userId,
+          marketId: order.marketId,
+          side: order.side,
+          type: order.type,
+          status: order.status,
+          price: order.price,
+          qty: order.qty,
+          filledQty: order.filledQty,
+          margin: order.margin,
+          leverage: order.leverage,
+        },
+        create: {
           id: order.id,
           userId: order.userId,
           marketId: order.marketId,
@@ -49,8 +64,12 @@ export async function handleDbEvent(event: DbEvent) {
     case "FILL_CREATED": {
       const fill = event.payload;
 
-      await prisma.fill.create({
-        data: {
+      await prisma.fill.upsert({
+        where: {
+          id: fill.id,
+        },
+        update: {},
+        create: {
           id: fill.id,
           marketId: fill.marketId,
           makerOrderId: fill.makerOrderId,
@@ -94,19 +113,13 @@ export async function handleDbEvent(event: DbEvent) {
         data: {
           userId: position.userId,
           marketId: position.marketId,
-
           side: position.side,
-
           qty: position.qty,
-
           entryPrice: position.entryPrice,
           exitPrice: position.exitPrice,
-
           margin: position.margin,
           leverage: position.leverage,
-
           realizedPnl: position.realizedPnl,
-
           openedAt: new Date(position.openedAt),
           closedAt: new Date(position.closedAt),
         },
