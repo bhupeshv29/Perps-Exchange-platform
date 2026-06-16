@@ -19,3 +19,8 @@ async function main() {
 }
 
 main();
+
+
+// similuating a fake data now -> later will connect with binance ws. 
+// challenge is market selection.(can send all the registered market to engine.) then surely i need to move to common package
+// 
