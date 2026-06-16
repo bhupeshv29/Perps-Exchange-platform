@@ -3,6 +3,7 @@ export type MarketConfig = {
   symbol: string;
   priceScale: number;
   qtyScale: number;
+  marginScale: number;
   maxLeverage: number;
   isActive: boolean;
 };
@@ -13,6 +14,7 @@ export const MARKETS: Record<string, MarketConfig> = {
     symbol: "BTCUSDT",
     priceScale: 100,
     qtyScale: 1000,
+    marginScale: 100,
     maxLeverage: 20,
     isActive: true,
   },
@@ -22,6 +24,7 @@ export const MARKETS: Record<string, MarketConfig> = {
     symbol: "ETHUSDT",
     priceScale: 100,
     qtyScale: 1000,
+    marginScale: 100,
     maxLeverage: 20,
     isActive: true,
   },
@@ -31,6 +34,7 @@ export const MARKETS: Record<string, MarketConfig> = {
     symbol: "SOLUSDT",
     priceScale: 100,
     qtyScale: 1000,
+    marginScale: 100,
     maxLeverage: 10,
     isActive: true,
   },

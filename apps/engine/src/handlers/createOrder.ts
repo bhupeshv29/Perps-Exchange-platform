@@ -1,7 +1,5 @@
 import { randomUUID } from "crypto";
-
-import { getMarketConfig, type EngineRequest, type EngineResponse, type Order } from "@repo/common";
-
+import type { EngineRequest, EngineResponse, Order } from "@repo/common";
 import { balances, orders } from "../state/state";
 import {
   addOrderToBook,
@@ -15,6 +13,7 @@ import {
   getProportionalMargin,
 } from "../position/position";
 import { publishDbEvent, publishWsEvent } from "../publish/events";
+import { getMarketConfig } from "../market/registry";
 
 function releaseUnfilledMargin(order: Order) {
   const balance = balances[order.userId];

@@ -1,9 +1,15 @@
 import { Router } from "express";
+import { prisma } from "@repo/db";
 import { requireAuth, type AuthRequest } from "../middleware/auth";
 import { validateBody } from "../middleware/validate";
 import { onRampSchema } from "../schemas/order.schema";
 import { sendToEngine } from "../services/loopback";
-import { prisma } from "@repo/db";
+import {
+  scaleMargin,
+  unscaleMargin,
+  unscalePrice,
+  unscaleQty,
+} from "../utils/scaling";
 
 export const accountRouter = Router();
 
@@ -12,56 +18,88 @@ accountRouter.post(
   requireAuth,
   validateBody(onRampSchema),
   async (req: AuthRequest, res) => {
-    try {
-      const response = await sendToEngine({
-        type: "ON_RAMP",
-        payload: {
-          userId: req.userId!,
-          ...req.body,
-        },
-      });
+    const response = await sendToEngine({
+      type: "ON_RAMP",
+      payload: {
+        userId: req.userId!,
+        amount: scaleMargin("BTCUSDT", req.body.amount),
+      },
+    });
 
-      return res.json(response);
-    } catch (error) {
-      return res.status(504).json({
-        message: error instanceof Error ? error.message : "Engine timeout",
-      });
-    }
+    return res.json(response);
   },
 );
 
 accountRouter.get("/balance", requireAuth, async (req: AuthRequest, res) => {
-  try {
-    const response = await sendToEngine({
-      type: "GET_BALANCE",
-      payload: {
-        userId: req.userId!,
-      },
-    });
+  const response = await sendToEngine({
+    type: "GET_BALANCE",
+    payload: { userId: req.userId! },
+  });
 
-    return res.json(response);
-  } catch (error) {
-    return res.status(504).json({
-      message: error instanceof Error ? error.message : "Engine timeout",
-    });
-  }
+  if (response.type !== "BALANCE") return res.json(response);
+
+  return res.json({
+    ...response,
+    payload: {
+      ...response.payload,
+      available: unscaleMargin("BTCUSDT", response.payload.available),
+      locked: unscaleMargin("BTCUSDT", response.payload.locked),
+    },
+  });
 });
 
 accountRouter.get("/positions", requireAuth, async (req: AuthRequest, res) => {
-  try {
-    const response = await sendToEngine({
-      type: "GET_POSITIONS",
-      payload: {
-        userId: req.userId!,
-      },
-    });
+  const response = await sendToEngine({
+    type: "GET_POSITIONS",
+    payload: { userId: req.userId! },
+  });
 
-    return res.json(response);
-  } catch (error) {
-    return res.status(504).json({
-      message: error instanceof Error ? error.message : "Engine timeout",
-    });
-  }
+  if (response.type !== "POSITIONS") return res.json(response);
+
+  return res.json({
+    ...response,
+    payload: response.payload.map((p) => ({
+      ...p,
+      qty: unscaleQty(p.marketId, p.qty),
+      entryPrice: unscalePrice(p.marketId, p.entryPrice),
+      margin: unscaleMargin(p.marketId, p.margin),
+      realizedPnl: unscaleMargin(p.marketId, p.realizedPnl),
+    })),
+  });
+});
+
+accountRouter.get("/orders", requireAuth, async (req: AuthRequest, res) => {
+  const orders = await prisma.order.findMany({
+    where: { userId: req.userId! },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return res.json({
+    orders: orders.map((o) => ({
+      ...o,
+      price: o.price === null ? null : unscalePrice(o.marketId, o.price),
+      qty: unscaleQty(o.marketId, o.qty),
+      filledQty: unscaleQty(o.marketId, o.filledQty),
+      margin: unscaleMargin(o.marketId, o.margin),
+    })),
+  });
+});
+
+accountRouter.get("/fills", requireAuth, async (req: AuthRequest, res) => {
+  const fills = await prisma.fill.findMany({
+    where: {
+      OR: [{ makerUserId: req.userId! }, { takerUserId: req.userId! }],
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  return res.json({
+    fills: fills.map((f) => ({
+      ...f,
+      price: unscalePrice(f.marketId, f.price),
+      qty: unscaleQty(f.marketId, f.qty),
+    })),
+  });
 });
 
 accountRouter.get(
@@ -69,53 +107,19 @@ accountRouter.get(
   requireAuth,
   async (req: AuthRequest, res) => {
     const positions = await prisma.closedPosition.findMany({
-      where: {
-        userId: req.userId!,
-      },
-      orderBy: {
-        closedAt: "desc",
-      },
+      where: { userId: req.userId! },
+      orderBy: { closedAt: "desc" },
     });
 
     return res.json({
-      positions,
+      positions: positions.map((p) => ({
+        ...p,
+        qty: unscaleQty(p.marketId, p.qty),
+        entryPrice: unscalePrice(p.marketId, p.entryPrice),
+        exitPrice: unscalePrice(p.marketId, p.exitPrice),
+        margin: unscaleMargin(p.marketId, p.margin),
+        realizedPnl: unscaleMargin(p.marketId, p.realizedPnl),
+      })),
     });
   },
 );
-
-accountRouter.get("/orders", requireAuth, async (req: AuthRequest, res) => {
-  const orders = await prisma.order.findMany({
-    where: {
-      userId: req.userId!,
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return res.json({
-    orders,
-  });
-});
-
-accountRouter.get("/fills", requireAuth, async (req: AuthRequest, res) => {
-  const fills = await prisma.fill.findMany({
-    where: {
-      OR: [
-        {
-          makerUserId: req.userId!,
-        },
-        {
-          takerUserId: req.userId!,
-        },
-      ],
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return res.json({
-    fills,
-  });
-});

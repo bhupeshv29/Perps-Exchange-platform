@@ -96,3 +96,31 @@ work to do now
     remove ws
     complete backend to engine
     move market in engine from package
+
+make conversion into small fn 
+
+
+
+Funding Rate
+Cross Margin
+Isolated Margin
+Reduce Only
+Stop Loss
+Take Profit
+OCO
+TP/SL
+Maker/Taker Fees
+Multi Asset Margin
+Portfolio Margin
+Multi Engine Sharding
+Multi Market Workers
+Admin Panel
+KYC
+Deposits/Withdrawals
+
+
+Snapshot Engine State
+
+apps/engine/src/snapshot/
+    saveSnapshot.ts
+    loadSnapshot.ts

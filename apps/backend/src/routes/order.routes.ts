@@ -3,6 +3,7 @@ import { requireAuth, type AuthRequest } from "../middleware/auth";
 import { validateBody } from "../middleware/validate";
 import { createOrderSchema, cancelOrderSchema } from "../schemas/order.schema";
 import { sendToEngine } from "../services/loopback";
+import { scaleMargin, scalePrice, scaleQty } from "../utils/scaling";
 
 export const orderRouter = Router();
 
@@ -12,11 +13,22 @@ orderRouter.post(
   validateBody(createOrderSchema),
   async (req: AuthRequest, res) => {
     try {
+      const body = req.body;
+
       const response = await sendToEngine({
         type: "CREATE_ORDER",
         payload: {
           userId: req.userId!,
-          ...req.body,
+          marketId: body.marketId,
+          side: body.side,
+          orderType: body.orderType,
+          price:
+            body.price === undefined
+              ? undefined
+              : scalePrice(body.marketId, body.price),
+          qty: scaleQty(body.marketId, body.qty),
+          margin: scaleMargin(body.marketId, body.margin),
+          leverage: body.leverage,
         },
       });
 

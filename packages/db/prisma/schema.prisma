@@ -35,63 +35,42 @@ enum PositionSide {
 }
 
 model User {
-  id       String @id @default(uuid())
-  email    String @unique
-  password String
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  balance Balance?
-
+  id        String     @id @default(uuid())
+  email     String     @unique
+  password  String
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  balance   Balance?
   orders    Order[]
   positions Position[]
 }
 
 model Balance {
-  userId    String @id
-  available Int    @default(0)
-  locked    Int    @default(0)
-
+  userId    String   @id
+  available Int      @default(0)
+  locked    Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-model Market {
-  id       String  @id @default(uuid())
-  symbol   String  @unique
-  isActive Boolean @default(true)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  orders    Order[]
-  fills     Fill[]
-  positions Position[]
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Order {
-  id        String      @id
-  userId    String
-  marketId  String
-  side      OrderSide
-  type      OrderType
-  status    OrderStatus @default(OPEN)
-  price     Int?
-  qty       Int
-  filledQty Int         @default(0)
-  margin    Int
-  leverage  Int
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user       User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  market     Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
-  makerFills Fill[] @relation("MakerOrder")
-  takerFills Fill[] @relation("TakerOrder")
+  id         String      @id
+  userId     String
+  marketId   String
+  side       OrderSide
+  type       OrderType
+  status     OrderStatus @default(OPEN)
+  price      Int?
+  qty        Int
+  filledQty  Int         @default(0)
+  margin     Int
+  leverage   Int
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  makerFills Fill[]      @relation("MakerOrder")
+  takerFills Fill[]      @relation("TakerOrder")
 
   @@index([userId])
   @@index([marketId])
@@ -100,7 +79,7 @@ model Order {
 }
 
 model Fill {
-  id           String @id
+  id           String   @id
   marketId     String
   makerOrderId String
   takerOrderId String
@@ -108,12 +87,9 @@ model Fill {
   takerUserId  String
   price        Int
   qty          Int
-
-  createdAt DateTime @default(now())
-
-  market     Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
-  makerOrder Order  @relation("MakerOrder", fields: [makerOrderId], references: [id], onDelete: Cascade)
-  takerOrder Order  @relation("TakerOrder", fields: [takerOrderId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  makerOrder   Order    @relation("MakerOrder", fields: [makerOrderId], references: [id], onDelete: Cascade)
+  takerOrder   Order    @relation("TakerOrder", fields: [takerOrderId], references: [id], onDelete: Cascade)
 
   @@index([marketId])
   @@index([makerUserId])
@@ -132,12 +108,9 @@ model Position {
   margin      Int
   leverage    Int
   realizedPnl Int          @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  market Market @relation(fields: [marketId], references: [id], onDelete: Cascade)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, marketId, side])
   @@index([userId])

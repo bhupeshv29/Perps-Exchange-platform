@@ -5,10 +5,10 @@ export const createOrderSchema = z.object({
   marketId: z.string().min(1),
   side: z.enum(["BID", "ASK"]),
   orderType: z.enum(["LIMIT", "MARKET"]),
-  price: z.coerce.number().int().positive().optional(),
-  qty: z.coerce.number().int().positive(),
-  margin: z.coerce.number().int().positive(),
-  leverage: z.coerce.number().default(DEFAULT_LEVERAGE),
+  price: z.coerce.number().positive().optional(),
+  qty: z.coerce.number().positive(),
+  margin: z.coerce.number().positive(),
+  leverage: z.coerce.number().int().positive().default(DEFAULT_LEVERAGE),
 });
 
 export const cancelOrderSchema = z.object({
@@ -17,5 +17,5 @@ export const cancelOrderSchema = z.object({
 });
 
 export const onRampSchema = z.object({
-  amount: z.coerce.number().int().positive(),
+  amount: z.coerce.number().positive(),
 });

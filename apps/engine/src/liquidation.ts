@@ -78,12 +78,6 @@ export async function checkLiquidations(marketId: string) {
       createdAt: Date.now(),
     });
 
-    await publishDbEvent({
-      type: "CLOSED_POSITION_CREATED",
-      payload: closedPosition,
-      createdAt: Date.now(),
-    });
-
     delete positions[
       getPositionKey(position.userId, position.marketId, position.side)
     ];

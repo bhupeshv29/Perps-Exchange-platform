@@ -18,6 +18,8 @@ import { processGetDepth } from "./handlers/getDepth";
 import { processCreateOrder } from "./handlers/createOrder";
 import { processCancelOrder } from "./handlers/cancelOrder";
 import { processPriceUpdate, type PriceUpdate } from "./handlers/priceUpdate";
+import { saveSnapshot } from "./snapshot/saveSnapShot";
+import { loadSnapshot } from "./snapshot/loadSnapShot";
 
 async function processEngineRequest(request: EngineRequest) {
   switch (request.type) {
@@ -132,9 +134,16 @@ async function startPriceConsumer() {
 
 async function startEngine() {
   await connectRedis();
-  startPriceConsumer().catch(console.error);
+
   await createConsumerGroup(redis, STREAMS.ENGINE_REQUESTS, GROUPS.ENGINE);
+
   await createConsumerGroup(redis, STREAMS.PRICE_UPDATES, GROUPS.ENGINE);
+
+  await loadSnapshot();
+
+  setInterval(() => {
+    saveSnapshot().catch(console.error);
+  }, 30_000);
 
   startEngineRequestConsumer().catch((error) => {
     console.error("engine request consumer crashed", error);
@@ -148,5 +157,26 @@ async function startEngine() {
 
   console.log("engine running");
 }
+
+startEngine();
+
+async function gracefulShutdown() {
+  try {
+    await saveSnapshot();
+    console.log("final snapshot saved");
+  } catch (error) {
+    console.error("failed to save snapshot", error);
+  }
+
+  process.exit(0);
+}
+
+process.on("SIGINT", () => {
+  gracefulShutdown();
+});
+
+process.on("SIGTERM", () => {
+  gracefulShutdown();
+});
 
 startEngine();
