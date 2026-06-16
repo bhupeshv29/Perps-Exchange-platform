@@ -124,3 +124,13 @@ Snapshot Engine State
 apps/engine/src/snapshot/
     saveSnapshot.ts
     loadSnapshot.ts
+
+
+✔ Orderbook
+✔ Matching Engine
+✔ Position Engine
+✔ Margin Locking
+✔ Liquidation
+✔ Snapshots
+✔ Websocket Updates
+✔ Persistence
