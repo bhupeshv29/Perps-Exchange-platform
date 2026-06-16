@@ -1,24 +1,14 @@
-import { STREAMS, GROUPS } from "@repo/common";
+import { GROUPS, STREAMS } from "@repo/common";
+import type { MarkPriceUpdate } from "@repo/common";
 
 import {
+  ackStreamMessage,
   consumeStreamMessages,
   createConsumerGroup,
-  ackStreamMessage,
 } from "@repo/redis";
 
 import { redis } from "./redis";
-
-import { markPrices } from "./state/state";
-
-import { publishWsEvent } from "./publish/events";
-
-import { checkLiquidations } from "./liquidation";
-
-type PriceUpdate = {
-  marketId: string;
-  price: number;
-  createdAt: number;
-};
+import { processPriceUpdate } from "./handlers/priceUpdate";
 
 export async function startPriceConsumer() {
   await createConsumerGroup(redis, STREAMS.PRICE_UPDATES, GROUPS.ENGINE);
@@ -50,20 +40,9 @@ export async function startPriceConsumer() {
             continue;
           }
 
-          const update = JSON.parse(raw) as PriceUpdate;
+          const update = JSON.parse(raw) as MarkPriceUpdate;
 
-          markPrices[update.marketId] = update.price;
-
-          await publishWsEvent({
-            type: "MARK_PRICE_UPDATE",
-            marketId: update.marketId,
-            payload: {
-              price: update.price,
-            },
-            createdAt: Date.now(),
-          });
-
-          await checkLiquidations(update.marketId);
+          await processPriceUpdate(update);
 
           await ackStreamMessage(
             redis,

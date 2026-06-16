@@ -1,4 +1,5 @@
-import type { EngineRequest, EngineResponse } from "@repo/common";
+import type { EngineRequest, EngineResponse, UserBalance } from "@repo/common";
+
 import { balances } from "../state/state";
 import { publishDbEvent, publishWsEvent } from "../publish/events";
 
@@ -7,26 +8,29 @@ export async function processOnRamp(
 ): Promise<EngineResponse> {
   const { userId, amount } = request.payload;
 
-  const balance = balances[userId] ?? {
+  const balance: UserBalance = balances[userId] ?? {
     userId,
     available: 0,
     locked: 0,
   };
 
   balance.available += amount;
+
   balances[userId] = balance;
 
-  await publishDbEvent({
+  const now = Date.now();
+
+  void publishDbEvent({
     type: "BALANCE_UPDATED",
     payload: balance,
-    createdAt: Date.now(),
+    createdAt: now,
   });
 
-  await publishWsEvent({
+  void publishWsEvent({
     type: "BALANCE_UPDATE",
     userId,
     payload: balance,
-    createdAt: Date.now(),
+    createdAt: now,
   });
 
   return {

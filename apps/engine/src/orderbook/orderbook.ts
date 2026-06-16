@@ -16,9 +16,10 @@ export function getOrCreateOrderbook(marketId: string): Orderbook {
 
 export function addOrderToBook(order: Order) {
   const book = getOrCreateOrderbook(order.marketId);
+
   const sideBook = order.side === "BID" ? book.bids : book.asks;
 
-  if (!order.price) {
+  if (order.price === undefined) {
     throw new Error("limit order price is required");
   }
 
@@ -37,44 +38,41 @@ export function updateOrderStatus(order: Order) {
 
   if (order.filledQty < order.qty) {
     order.status = "PARTIALLY_FILLED";
+
     return;
   }
 
   order.status = "FILLED";
 }
 
-export function removeFilledOrdersFromBook(book: Orderbook) {
-  for (const price of Object.keys(book.bids)) {
-    book.bids[Number(price)] = book.bids[Number(price)]!.filter(
+function cleanupSide(sideBook: Record<number, Order[]>) {
+  for (const price of Object.keys(sideBook)) {
+    const level = sideBook[Number(price)];
+
+    if (!level) continue;
+
+    sideBook[Number(price)] = level.filter(
       (order) => order.filledQty < order.qty,
     );
 
-    if (book.bids[Number(price)]!.length === 0) {
-      delete book.bids[Number(price)];
-    }
-  }
-
-  for (const price of Object.keys(book.asks)) {
-    book.asks[Number(price)] = book.asks[Number(price)]!.filter(
-      (order) => order.filledQty < order.qty,
-    );
-
-    if (book.asks[Number(price)]!.length === 0) {
-      delete book.asks[Number(price)];
+    if (sideBook[Number(price)]!.length === 0) {
+      delete sideBook[Number(price)];
     }
   }
 }
 
-//** 
-// this is for depth calculation for fe
-// 
-// */
+export function removeFilledOrdersFromBook(book: Orderbook) {
+  cleanupSide(book.bids);
+  cleanupSide(book.asks);
+}
+
 function aggregateSide(sideBook: Record<number, Order[]>): [number, number][] {
   return Object.entries(sideBook)
     .map(([price, orders]) => {
-      const qty = orders.reduce((sum, order) => {
-        return sum + (order.qty - order.filledQty);
-      }, 0);
+      const qty = orders.reduce(
+        (sum, order) => sum + (order.qty - order.filledQty),
+        0,
+      );
 
       return [Number(price), qty] as [number, number];
     })
@@ -86,7 +84,9 @@ export function getDepth(marketId: string): Depth {
 
   return {
     marketId,
+
     bids: aggregateSide(book.bids).sort((a, b) => b[0] - a[0]),
+
     asks: aggregateSide(book.asks).sort((a, b) => a[0] - b[0]),
   };
 }
@@ -112,14 +112,19 @@ export function getBestBidPrice(book: Orderbook): number | null {
 }
 
 export function removeOrderFromBook(order: Order) {
-  if (!order.price) return;
+  if (order.price === undefined) {
+    return;
+  }
 
   const book = getOrCreateOrderbook(order.marketId);
+
   const sideBook = order.side === "BID" ? book.bids : book.asks;
 
   const ordersAtPrice = sideBook[order.price];
 
-  if (!ordersAtPrice) return;
+  if (!ordersAtPrice) {
+    return;
+  }
 
   const remainingOrders = ordersAtPrice.filter((o) => o.id !== order.id);
 

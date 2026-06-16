@@ -1,8 +1,20 @@
 import type { EngineRequest, EngineResponse } from "@repo/common";
+
 import { balances, orders } from "../state/state";
+
 import { getDepth, removeOrderFromBook } from "../orderbook/orderbook";
+
 import { getProportionalMargin } from "../position/position";
+
 import { publishDbEvent, publishWsEvent } from "../publish/events";
+
+function error(requestId: string, message: string): EngineResponse {
+  return {
+    type: "ERROR",
+    requestId,
+    error: message,
+  };
+}
 
 export async function processCancelOrder(
   request: Extract<EngineRequest, { type: "CANCEL_ORDER" }>,
@@ -12,27 +24,15 @@ export async function processCancelOrder(
   const order = orders[orderId];
 
   if (!order) {
-    return {
-      type: "ERROR",
-      requestId: request.requestId,
-      error: "order not found",
-    };
+    return error(request.requestId, "order not found");
   }
 
   if (order.userId !== userId) {
-    return {
-      type: "ERROR",
-      requestId: request.requestId,
-      error: "unauthorized order cancel",
-    };
+    return error(request.requestId, "unauthorized order cancel");
   }
 
   if (order.status === "FILLED" || order.status === "CANCELLED") {
-    return {
-      type: "ERROR",
-      requestId: request.requestId,
-      error: "order cannot be cancelled",
-    };
+    return error(request.requestId, "order cannot be cancelled");
   }
 
   removeOrderFromBook(order);
@@ -41,6 +41,7 @@ export async function processCancelOrder(
 
   if (balance) {
     const filledMargin = getProportionalMargin(order, order.filledQty);
+
     const releasableMargin = order.margin - filledMargin;
 
     balance.locked -= releasableMargin;
@@ -49,18 +50,21 @@ export async function processCancelOrder(
 
   order.status = "CANCELLED";
 
-  await publishDbEvent({
+  void publishDbEvent({
     type: "ORDER_UPDATED",
     payload: order,
     createdAt: Date.now(),
   });
-  await publishDbEvent({
-    type: "BALANCE_UPDATED",
-    payload: balance!,
-    createdAt: Date.now(),
-  });
 
-  await publishWsEvent({
+  if (balance) {
+    void publishDbEvent({
+      type: "BALANCE_UPDATED",
+      payload: balance,
+      createdAt: Date.now(),
+    });
+  }
+
+  void publishWsEvent({
     type: "ORDER_UPDATE",
     userId,
     payload: order,
@@ -68,7 +72,7 @@ export async function processCancelOrder(
   });
 
   if (balance) {
-    await publishWsEvent({
+    void publishWsEvent({
       type: "BALANCE_UPDATE",
       userId,
       payload: balance,
@@ -76,7 +80,7 @@ export async function processCancelOrder(
     });
   }
 
-  await publishWsEvent({
+  void publishWsEvent({
     type: "DEPTH_UPDATE",
     marketId,
     payload: getDepth(marketId),

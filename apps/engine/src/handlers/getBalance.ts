@@ -1,4 +1,9 @@
-import type { EngineRequest, EngineResponse } from "@repo/common";
+import type {
+  EngineRequest,
+  EngineResponse,
+  UserBalance,
+} from "@repo/common";
+
 import { balances } from "../state/state";
 
 export async function processGetBalance(
@@ -6,7 +11,7 @@ export async function processGetBalance(
 ): Promise<EngineResponse> {
   const { userId } = request.payload;
 
-  const balance = balances[userId] ?? {
+  const balance: UserBalance = balances[userId] ?? {
     userId,
     available: 0,
     locked: 0,

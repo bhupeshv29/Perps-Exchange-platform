@@ -1,5 +1,4 @@
 export type MarketConfig = {
-  id: string;
   symbol: string;
   priceScale: number;
   qtyScale: number;
@@ -8,9 +7,8 @@ export type MarketConfig = {
   isActive: boolean;
 };
 
-export const MARKETS: Record<string, MarketConfig> = {
+export const MARKETS = {
   BTCUSDT: {
-    id: "BTCUSDT",
     symbol: "BTCUSDT",
     priceScale: 100,
     qtyScale: 1000,
@@ -20,7 +18,6 @@ export const MARKETS: Record<string, MarketConfig> = {
   },
 
   ETHUSDT: {
-    id: "ETHUSDT",
     symbol: "ETHUSDT",
     priceScale: 100,
     qtyScale: 1000,
@@ -30,7 +27,6 @@ export const MARKETS: Record<string, MarketConfig> = {
   },
 
   SOLUSDT: {
-    id: "SOLUSDT",
     symbol: "SOLUSDT",
     priceScale: 100,
     qtyScale: 1000,
@@ -38,8 +34,10 @@ export const MARKETS: Record<string, MarketConfig> = {
     maxLeverage: 10,
     isActive: true,
   },
-};
+} satisfies Record<string, MarketConfig>;
 
-export function getMarketConfig(marketId: string) {
+export function getMarketConfig(
+  marketId: string,
+): MarketConfig | undefined {
   return MARKETS[marketId];
 }

@@ -1,12 +1,14 @@
 import type { Fill, Order, Position, PositionSide, Side } from "@repo/common";
+
 import { balances, getPositionKey, orders, positions } from "../state/state";
+import { calculatePnl } from "./pnl";
 
 export type PositionUpdateResult = {
   updatedPositions: Position[];
 };
 
-export function getPositionSide(orderSide: Side): PositionSide {
-  return orderSide === "BID" ? "LONG" : "SHORT";
+export function getPositionSide(side: Side): PositionSide {
+  return side === "BID" ? "LONG" : "SHORT";
 }
 
 function getOppositeSide(side: PositionSide): PositionSide {
@@ -17,31 +19,44 @@ export function getProportionalMargin(order: Order, fillQty: number): number {
   return Math.floor((order.margin * fillQty) / order.qty);
 }
 
-function weightedAveragePrice(input: {
-  oldQty: number;
-  oldPrice: number;
-  newQty: number;
-  newPrice: number;
-}) {
-  const totalQty = input.oldQty + input.newQty;
-  if (totalQty === 0) return 0;
+function weightedAveragePrice(
+  oldQty: number,
+  oldPrice: number,
+  newQty: number,
+  newPrice: number,
+): number {
+  const totalQty = oldQty + newQty;
 
-  return Math.floor(
-    (input.oldQty * input.oldPrice + input.newQty * input.newPrice) / totalQty,
-  );
-}
-
-function calculatePnl(input: {
-  side: PositionSide;
-  entryPrice: number;
-  exitPrice: number;
-  qty: number;
-}) {
-  if (input.side === "LONG") {
-    return (input.exitPrice - input.entryPrice) * input.qty;
+  if (totalQty === 0) {
+    return 0;
   }
 
-  return (input.entryPrice - input.exitPrice) * input.qty;
+  return Math.floor((oldQty * oldPrice + newQty * newPrice) / totalQty);
+}
+
+function createPosition(input: {
+  userId: string;
+  marketId: string;
+  side: PositionSide;
+  qty: number;
+  price: number;
+  margin: number;
+  leverage: number;
+}): Position {
+  return {
+    userId: input.userId,
+    marketId: input.marketId,
+    side: input.side,
+
+    qty: input.qty,
+    entryPrice: input.price,
+
+    margin: input.margin,
+    leverage: input.leverage,
+
+    realizedPnl: 0,
+    updatedAt: Date.now(),
+  };
 }
 
 function increasePosition(input: {
@@ -54,37 +69,44 @@ function increasePosition(input: {
   leverage: number;
 }): Position {
   const key = getPositionKey(input.userId, input.marketId, input.side);
-  const existingPosition = positions[key];
 
-  if (!existingPosition) {
-    const position: Position = {
-      userId: input.userId,
-      marketId: input.marketId,
-      side: input.side,
-      qty: input.qty,
-      entryPrice: input.price,
-      margin: input.margin,
-      leverage: input.leverage,
-      realizedPnl: 0,
-      updatedAt: Date.now(),
-    };
+  const position = positions[key];
 
-    positions[key] = position;
-    return position;
+  if (!position) {
+    const newPosition = createPosition(input);
+
+    positions[key] = newPosition;
+
+    return newPosition;
   }
 
-  existingPosition.entryPrice = weightedAveragePrice({
-    oldQty: existingPosition.qty,
-    oldPrice: existingPosition.entryPrice,
-    newQty: input.qty,
-    newPrice: input.price,
-  });
+  position.entryPrice = weightedAveragePrice(
+    position.qty,
+    position.entryPrice,
+    input.qty,
+    input.price,
+  );
 
-  existingPosition.qty += input.qty;
-  existingPosition.margin += input.margin;
-  existingPosition.updatedAt = Date.now();
+  position.qty += input.qty;
+  position.margin += input.margin;
+  position.updatedAt = Date.now();
 
-  return existingPosition;
+  return position;
+}
+
+function settleClosedPosition(
+  userId: string,
+  releasedMargin: number,
+  realizedPnl: number,
+) {
+  const balance = balances[userId];
+
+  if (!balance) {
+    return;
+  }
+
+  balance.locked -= releasedMargin;
+  balance.available += releasedMargin + realizedPnl;
 }
 
 function closePosition(input: {
@@ -98,6 +120,7 @@ function closePosition(input: {
   updatedPosition: Position | null;
 } {
   const key = getPositionKey(input.userId, input.marketId, input.side);
+
   const position = positions[key];
 
   if (!position) {
@@ -125,12 +148,7 @@ function closePosition(input: {
   position.realizedPnl += realizedPnl;
   position.updatedAt = Date.now();
 
-  const balance = balances[input.userId];
-
-  if (balance) {
-    balance.locked -= releasedMargin;
-    balance.available += releasedMargin + realizedPnl;
-  }
+  settleClosedPosition(input.userId, releasedMargin, realizedPnl);
 
   if (position.qty === 0) {
     delete positions[key];
@@ -143,17 +161,14 @@ function closePosition(input: {
 }
 
 function applyFillForOrder(order: Order, fill: Fill): Position[] {
-  const updatedPositions: Position[] = [];
+  const updated: Position[] = [];
 
   const incomingSide = getPositionSide(order.side);
+
   const oppositeSide = getOppositeSide(incomingSide);
 
-  const oppositeKey = getPositionKey(
-    order.userId,
-    order.marketId,
-    oppositeSide,
-  );
-  const oppositePosition = positions[oppositeKey];
+  const oppositePosition =
+    positions[getPositionKey(order.userId, order.marketId, oppositeSide)];
 
   let remainingQty = fill.qty;
 
@@ -169,25 +184,25 @@ function applyFillForOrder(order: Order, fill: Fill): Position[] {
     remainingQty -= closeResult.closedQty;
 
     if (closeResult.updatedPosition) {
-      updatedPositions.push(closeResult.updatedPosition);
+      updated.push(closeResult.updatedPosition);
     }
   }
 
   if (remainingQty > 0) {
-    const position = increasePosition({
-      userId: order.userId,
-      marketId: order.marketId,
-      side: incomingSide,
-      qty: remainingQty,
-      price: fill.price,
-      margin: getProportionalMargin(order, remainingQty),
-      leverage: order.leverage,
-    });
-
-    updatedPositions.push(position);
+    updated.push(
+      increasePosition({
+        userId: order.userId,
+        marketId: order.marketId,
+        side: incomingSide,
+        qty: remainingQty,
+        price: fill.price,
+        margin: getProportionalMargin(order, remainingQty),
+        leverage: order.leverage,
+      }),
+    );
   }
 
-  return updatedPositions;
+  return updated;
 }
 
 export function applyFillsToPositions(fills: Fill[]): PositionUpdateResult {
@@ -195,6 +210,7 @@ export function applyFillsToPositions(fills: Fill[]): PositionUpdateResult {
 
   for (const fill of fills) {
     const makerOrder = orders[fill.makerOrderId];
+
     const takerOrder = orders[fill.takerOrderId];
 
     if (makerOrder) {

@@ -1,13 +1,15 @@
+import type { MarkPriceUpdate } from "@repo/common";
+
+import { markPrices } from "../state/state";
 import { publishWsEvent } from "../publish/events";
+import { checkLiquidations } from "../liquidation";
 
-export type PriceUpdate = {
-  marketId: string;
-  price: number;
-  createdAt: number;
-};
+export async function processPriceUpdate(
+  update: MarkPriceUpdate,
+): Promise<void> {
+  markPrices[update.marketId] = update.price;
 
-export async function processPriceUpdate(update: PriceUpdate) {
-  await publishWsEvent({
+  publishWsEvent({
     type: "MARK_PRICE_UPDATE",
     marketId: update.marketId,
     payload: {
@@ -15,4 +17,6 @@ export async function processPriceUpdate(update: PriceUpdate) {
     },
     createdAt: update.createdAt,
   });
+
+  await checkLiquidations(update.marketId);
 }

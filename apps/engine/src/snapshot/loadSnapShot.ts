@@ -12,15 +12,20 @@ import type { EngineSnapshot } from "./types";
 
 const SNAPSHOT_FILE = "./snapshots/engine.json";
 
-export async function loadSnapshot() {
+export async function loadSnapshot(): Promise<void> {
   try {
     const raw = await readFile(
       SNAPSHOT_FILE,
       "utf8",
     );
 
-    const snapshot =
-      JSON.parse(raw) as EngineSnapshot;
+    const snapshot = JSON.parse(raw) as EngineSnapshot;
+
+    if (snapshot.version !== 1) {
+      throw new Error(
+        `unsupported snapshot version: ${snapshot.version}`,
+      );
+    }
 
     Object.assign(
       balances,
@@ -51,7 +56,10 @@ export async function loadSnapshot() {
       "snapshot loaded",
       new Date(snapshot.createdAt),
     );
-  } catch {
-    console.log("no snapshot found");
+  } catch (error) {
+    console.log(
+      "no snapshot found or failed to load snapshot",
+      error,
+    );
   }
 }

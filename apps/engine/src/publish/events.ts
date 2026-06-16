@@ -4,9 +4,23 @@ import { publishPubSubMessage, publishStreamMessage } from "@repo/redis";
 import { redis } from "../redis";
 
 export async function publishDbEvent(event: DbEvent) {
-  await publishStreamMessage(redis, STREAMS.DB_EVENTS, event);
+  try {
+    await publishStreamMessage(redis, STREAMS.DB_EVENTS, event);
+  } catch (error) {
+    console.error("failed to publish db event", {
+      type: event.type,
+      error,
+    });
+  }
 }
 
 export async function publishWsEvent(event: WsEvent) {
-  await publishPubSubMessage(redis, CHANNELS.WS_EVENTS, event);
+  try {
+    await publishPubSubMessage(redis, CHANNELS.WS_EVENTS, event);
+  } catch (error) {
+    console.error("failed to publish ws event", {
+      type: event.type,
+      error,
+    });
+  }
 }
