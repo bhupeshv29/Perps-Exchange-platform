@@ -13,10 +13,7 @@ import {
   unscaleQty,
 } from "../utils/scaling";
 
-import {
-  unscaleBalanceResponse,
-  unscalePosition,
-} from "../utils/unscale";
+import { unscaleBalanceResponse, unscalePosition } from "../utils/unscale";
 
 export const accountRouter = Router();
 
