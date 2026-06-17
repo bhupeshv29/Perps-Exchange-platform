@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { sendToEngine } from "../services/loopback";
-import { unscalePrice, unscaleQty } from "../utils/scaling";
+import { unscalePrice, unscaleQty } from "@repo/common";
 
 export const marketRouter = Router();
 

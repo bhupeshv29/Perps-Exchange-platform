@@ -7,9 +7,9 @@ import { createOrderSchema, cancelOrderSchema } from "../schemas/order.schema";
 
 import { sendToEngine } from "../services/loopback";
 
-import { scaleBalance, scalePrice, scaleQty } from "../utils/scaling";
+import { scaleBalance, scalePrice, scaleQty } from "@repo/common";
 
-import { unscaleOrder, unscaleFill } from "../utils/unscale";
+import { unscaleOrder, unscaleFill } from "@repo/common";
 
 export const orderRouter = Router();
 

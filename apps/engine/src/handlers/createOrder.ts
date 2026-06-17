@@ -24,7 +24,7 @@ import {
 } from "../position/position";
 
 import { publishDbEvent, publishWsEvent } from "../publish/events";
-import { getMarketConfig } from "../market/registry";
+import { getMarketConfig } from "@repo/common";
 
 function reject(requestId: string, error: string): EngineResponse {
   return {
