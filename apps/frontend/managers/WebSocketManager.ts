@@ -6,6 +6,7 @@ import { useWsStore } from "@/stores/ws-store";
 export class WebSocketManager {
   private static instance: WebSocketManager;
   private ws: WebSocket | null = null;
+  private currentMarket: string | null = null;
 
   private constructor() {}
 
@@ -25,9 +26,19 @@ export class WebSocketManager {
     this.ws.onopen = () => {
       useWsStore.getState().setConnected(true);
       console.log("ws connected");
+
+      if (this.currentMarket) {
+        this.send({
+          type: "SUBSCRIBE_MARKET",
+          marketId: this.currentMarket,
+        });
+
+        console.log("subscribed market", this.currentMarket);
+      }
     };
 
     this.ws.onmessage = (event) => {
+      console.log("ws message", event.data);
       this.handleMessage(event.data);
     };
 
@@ -50,13 +61,28 @@ export class WebSocketManager {
   }
 
   subscribeMarket(marketId: string) {
+    this.currentMarket = marketId;
+
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      console.log("market saved, will subscribe on open", marketId);
+      return;
+    }
+
     this.send({
       type: "SUBSCRIBE_MARKET",
       marketId,
     });
+
+    console.log("subscribed market", marketId);
   }
 
   unsubscribeMarket(marketId: string) {
+    if (this.currentMarket === marketId) {
+      this.currentMarket = null;
+    }
+
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
+
     this.send({
       type: "UNSUBSCRIBE_MARKET",
       marketId,
@@ -64,9 +90,7 @@ export class WebSocketManager {
   }
 
   private send(message: unknown) {
-    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      return;
-    }
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) return;
 
     this.ws.send(JSON.stringify(message));
   }
