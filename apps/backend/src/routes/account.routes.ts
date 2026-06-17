@@ -7,13 +7,13 @@ import { onRampSchema } from "../schemas/order.schema";
 import { sendToEngine } from "../services/loopback";
 
 import {
+  unscalePosition,
   scaleBalance,
-  unscaleBalance,
   unscalePrice,
   unscaleQty,
-} from "../utils/scaling";
-
-import { unscaleBalanceResponse, unscalePosition } from "../utils/unscale";
+  unscaleBalance,
+  unscaleBalanceResponse,
+} from "@repo/common";
 
 export const accountRouter = Router();
 

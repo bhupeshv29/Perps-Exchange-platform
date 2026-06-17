@@ -3,6 +3,7 @@ import { CHANNELS, type WsEvent } from "@repo/common";
 
 import { connectRedis, redis } from "./redis";
 import { verifyToken } from "./auth";
+import { formatWsEvent } from "./formatWsEvent";
 
 type Client = {
   ws: WebSocket;
@@ -114,7 +115,7 @@ function sendToClient(client: Client, event: WsEvent) {
     return;
   }
 
-  client.ws.send(JSON.stringify(event));
+  client.ws.send(JSON.stringify(formatWsEvent(event)));
 }
 
 function isPrivateEvent(event: WsEvent): event is PrivateWsEvent {
