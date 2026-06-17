@@ -168,3 +168,10 @@ again postman testing (17 june)
     }
 }
 should reponse be unscaling ✅
+
+didn't added unscaling for ws booradcasst (thinking of either adding in common or not or also moving  market  to commmon)
+
+docker add to each http. and make fe in bun, nextjs, tsq, tailwind, and library
+margin calulation based on postion value (price x qty) and leverage cal.
+orderbook optimization using sorting
+root env
