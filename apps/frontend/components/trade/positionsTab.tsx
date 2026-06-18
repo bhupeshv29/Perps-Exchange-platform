@@ -2,22 +2,10 @@
 
 import { usePositions } from "@/hooks/usePosition";
 
-type Position = {
-  userId: string;
-  marketId: string;
-  side: "LONG" | "SHORT";
-  qty: number;
-  entryPrice: number;
-  margin: number;
-  leverage: number;
-  realizedPnl: number;
-  updatedAt: number;
-};
-
 export function PositionsTab() {
   const { data, isLoading } = usePositions();
-    //@ts-ignore
-  const positions: Position[] = data?.payload ?? [];
+
+  const positions = data?.payload ?? [];
 
   if (isLoading) {
     return <EmptyState title="Loading positions..." />;
@@ -51,9 +39,7 @@ export function PositionsTab() {
           </span>
 
           <span>{position.qty.toFixed(3)}</span>
-
           <span>{position.entryPrice.toFixed(2)}</span>
-
           <span>{position.leverage}x</span>
 
           <span className={position.realizedPnl >= 0 ? "text-bid" : "text-ask"}>

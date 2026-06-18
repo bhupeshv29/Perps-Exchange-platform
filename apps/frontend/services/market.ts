@@ -1,11 +1,12 @@
 import { api } from "@/lib/api";
+import type { DepthResponse } from "@/types/api";
 
-export async function getDepth(marketId: string) {
-  const response = await api.get(`/depth/${marketId}`);
-  return response.data;
+export async function getDepth(marketId: string): Promise<DepthResponse> {
+  const { data } = await api.get(`/markets/${marketId}/depth`);
+  return data;
 }
 
 export async function getMarkets() {
-  const response = await api.get("/markets");
-  return response.data;
+  const { data } = await api.get("/markets");
+  return data;
 }

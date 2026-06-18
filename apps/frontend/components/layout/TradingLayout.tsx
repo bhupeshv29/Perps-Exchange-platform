@@ -6,7 +6,7 @@ import { DepthPanel } from "../trade/DepthPanel";
 import { OrderForm } from "../trade/OrderForm";
 import { TopNavbar } from "./TopNavbar";
 import { useEffect } from "react";
-import { DepositModal } from "../account/DepositModel";
+import { DepositModal } from "../account/DepositModal";
 
 type Props = {
   marketId: string;

@@ -2,7 +2,7 @@
 
 import { useTradeStore } from "@/stores/trade-store";
 import { useWsStore } from "@/stores/ws-store";
-import { ProfileDropdown } from "../account/ProfileDropDown";
+import { ProfileDropdown } from "../account/ProfileDropdown";
 
 export function TopNavbar() {
   const selectedMarket = useTradeStore((state) => state.selectedMarket);

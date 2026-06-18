@@ -11,7 +11,7 @@ async function TradePage({ params }: Props) {
   const { marketId } = await params;
   return (
     <AuthGuard>
-      <TradingLayout marketId={marketId} />;
+      <TradingLayout marketId={marketId} />
     </AuthGuard>
   );
 }

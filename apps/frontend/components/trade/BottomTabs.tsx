@@ -1,7 +1,7 @@
 "use client";
 
 import { useUiStore, type BottomTab } from "@/stores/ui-store";
-import { PositionsTab } from "./positionsTab";
+import { PositionsTab } from "./PositionsTab";
 import { OpenOrdersTab } from "./OpenOrdersTab";
 import { FillHistoryTab } from "./FillHistoryTab";
 import { BalancesTab } from "./BalancesTab";

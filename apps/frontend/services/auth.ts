@@ -11,21 +11,16 @@ type SignUpInput = {
 };
 
 export async function signIn(data: SignInInput) {
-  const response = await api.post("auth/signin", data);
+  const response = await api.post("/auth/signin", data);
   return response.data;
 }
 
 export async function signUp(data: SignUpInput) {
-  const response = await api.post("auth/signup", data);
+  const response = await api.post("/auth/signup", data);
   return response.data;
 }
 
 export async function signOut() {
   const { data } = await api.post("/auth/logout");
   return data;
-}
-
-export async function getMe(data: SignInInput) {
-  const response = await api.post("auth/me");
-  return response.data;
 }
