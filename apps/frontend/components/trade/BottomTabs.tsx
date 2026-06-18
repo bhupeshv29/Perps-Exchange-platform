@@ -1,12 +1,12 @@
 "use client";
 
 import { useUiStore, type BottomTab } from "@/stores/ui-store";
-import { PositionsTab } from "./PositionsTab";
 import { OpenOrdersTab } from "./OpenOrdersTab";
 import { FillHistoryTab } from "./FillHistoryTab";
 import { BalancesTab } from "./BalancesTab";
 import { ClosedPositionsTab } from "./ClosedPositionsTab";
 import { OrderHistoryTab } from "./OrderHistoryTab";
+import { PositionsTab } from "./positionsTab";
 
 const tabs: {
   id: BottomTab;

@@ -20,10 +20,6 @@ api.interceptors.response.use(
         toast.error("You don't have permission.");
         break;
 
-      case 404:
-        toast.error("Resource not found.");
-        break;
-
       case 500:
         toast.error("Something went wrong.");
         break;

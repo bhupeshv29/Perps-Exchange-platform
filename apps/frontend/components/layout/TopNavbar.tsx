@@ -4,7 +4,8 @@ import { useTradeStore } from "@/stores/trade-store";
 import { useWsStore } from "@/stores/ws-store";
 
 import { useRouter } from "next/navigation";
-import { ProfileDropdown } from "../account/ProfileDropdown";
+import { ProfileDropdown } from "../account/ProfileDropDown";
+
 
 export function TopNavbar() {
   const selectedMarket = useTradeStore((state) => state.selectedMarket);

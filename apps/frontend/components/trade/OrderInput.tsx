@@ -26,7 +26,7 @@ export function OrderInput({
       <div className="flex items-center rounded-md border border-border bg-background focus-within:border-primary">
         <input
           type={type}
-          min={type === "number" ? 1 : undefined}
+          min={type === "number" ? 0 : undefined}
           placeholder={placeholder}
           className="w-full bg-transparent px-2 py-1.5 text-sm outline-none"
           onWheel={(e) => e.currentTarget.blur()}

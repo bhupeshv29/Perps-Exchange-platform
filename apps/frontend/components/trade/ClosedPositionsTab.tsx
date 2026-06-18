@@ -5,8 +5,7 @@ import { useClosedPositions } from "@/hooks/useClosedPositions";
 export function ClosedPositionsTab() {
   const { data, isLoading } = useClosedPositions();
 
-  const positions = data?.closedPositions ?? data?.payload ?? [];
-
+  const positions = data?.positions ?? [];
   if (isLoading) return <EmptyState title="Loading closed positions..." />;
 
   if (positions.length === 0) {

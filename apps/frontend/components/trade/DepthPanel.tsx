@@ -107,7 +107,7 @@ export function DepthPanel() {
             ))}
           </div>
 
-          <div className="border-y border-border bg-background py-0.2 text-center">
+          <div className="border-y border-border bg-background py-0.5 text-center">
             <p className="font-mono text-xs font-semibold text-text-primary">
               {lastTradePrice.toFixed(2)}
             </p>
