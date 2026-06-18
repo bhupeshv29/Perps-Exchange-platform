@@ -5,7 +5,8 @@ export type BottomTab =
   | "positions"
   | "open-orders"
   | "fill-history"
-  | "order-history";
+  | "order-history"
+  | "closed-positions";
 
 type UiStore = {
   bottomTab: BottomTab;

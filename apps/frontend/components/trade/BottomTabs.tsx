@@ -5,6 +5,8 @@ import { PositionsTab } from "./PositionsTab";
 import { OpenOrdersTab } from "./OpenOrdersTab";
 import { FillHistoryTab } from "./FillHistoryTab";
 import { BalancesTab } from "./BalancesTab";
+import { ClosedPositionsTab } from "./ClosedPositionsTab";
+import { OrderHistoryTab } from "./OrderHistoryTab";
 
 const tabs: {
   id: BottomTab;
@@ -15,6 +17,7 @@ const tabs: {
   { id: "open-orders", label: "Open Orders" },
   { id: "fill-history", label: "Fill History" },
   { id: "order-history", label: "Order History" },
+  { id: "closed-positions", label: "Closed Positions" },
 ];
 
 export function BottomTabs() {
@@ -44,13 +47,10 @@ export function BottomTabs() {
         {activeTab === "open-orders" && <OpenOrdersTab />}
         {activeTab === "fill-history" && <FillHistoryTab />}
         {activeTab === "order-history" && <OrderHistoryTab />}
+        {activeTab === "closed-positions" && <ClosedPositionsTab />}
       </div>
     </section>
   );
-}
-
-function OrderHistoryTab() {
-  return <EmptyState title="No order history" />;
 }
 
 function EmptyState({ title }: { title: string }) {
