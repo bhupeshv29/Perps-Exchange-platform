@@ -238,3 +238,12 @@ next feat ->
         9. Position liquidation price
 
         10. Responsive layout
+
+
+add tanstack tables
+correct depth cal.
+correct the liquidation cal in backend
+maintainance margin check
+self matching stop
+closed position check
+order history complete

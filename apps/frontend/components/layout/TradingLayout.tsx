@@ -1,11 +1,12 @@
 "use client";
+
+import { useEffect } from "react";
 import { useTradeStore } from "@/stores/trade-store";
 import { BottomTabs } from "../trade/BottomTabs";
 import { ChartPanel } from "../trade/ChartPanel";
 import { DepthPanel } from "../trade/DepthPanel";
 import { OrderForm } from "../trade/OrderForm";
 import { TopNavbar } from "./TopNavbar";
-import { useEffect } from "react";
 import { DepositModal } from "../account/DepositModal";
 
 type Props = {
@@ -14,35 +15,42 @@ type Props = {
 
 export function TradingLayout({ marketId }: Props) {
   const setSelectedMarket = useTradeStore((state) => state.setSelectedMarket);
-
-  const resetDepth = useTradeStore((s) => s.resetDepth);
-  const resetTrades = useTradeStore((s) => s.resetTrades);
-  const resetPrices = useTradeStore((s) => s.resetPrices);
+  const resetDepth = useTradeStore((state) => state.resetDepth);
+  const resetTrades = useTradeStore((state) => state.resetTrades);
+  const resetPrices = useTradeStore((state) => state.resetPrices);
 
   useEffect(() => {
     resetDepth();
     resetTrades();
     resetPrices();
-
     setSelectedMarket(marketId);
-  }, [marketId, setSelectedMarket, resetDepth, resetTrades, resetPrices]);
+  }, [marketId, resetDepth, resetTrades, resetPrices, setSelectedMarket]);
+
   return (
-    <main className="flex h-screen flex-col overflow-hidden bg-background text-text-primary">
+    <main className="flex min-h-screen flex-col bg-background text-text-primary lg:h-screen lg:overflow-hidden">
       <TopNavbar />
 
-      <div className="grid min-h-0 flex-1 grid-cols-[1fr_340px] gap-2 p-2">
-        <section className="flex min-w-0 flex-col gap-2">
-          <div className="grid min-h-0 flex-1 grid-cols-[1fr_360px] gap-2">
-            <ChartPanel />
-            <DepthPanel />
+      <div className="grid flex-1 gap-2 p-2 lg:min-h-0 lg:grid-cols-[1fr_340px]">
+        <section className="flex min-w-0 flex-col gap-2 lg:min-h-0">
+          <div className="grid gap-2 lg:min-h-0 lg:flex-1 xl:grid-cols-[1fr_360px]">
+            <div className="h-[360px] lg:h-auto lg:min-h-0">
+              <ChartPanel />
+            </div>
+
+            <div className="h-[420px] lg:h-auto lg:min-h-0">
+              <DepthPanel />
+            </div>
           </div>
 
           <BottomTabs />
         </section>
 
-        <OrderForm />
-        <DepositModal />
+        <div className="lg:min-h-0">
+          <OrderForm />
+        </div>
       </div>
+
+      <DepositModal />
     </main>
   );
 }

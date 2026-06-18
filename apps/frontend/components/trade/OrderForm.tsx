@@ -42,12 +42,11 @@ export function OrderForm() {
   }
 
   return (
-    <aside className="rounded-md border border-border bg-surface">
+    <aside className="rounded-md border border-border bg-surface lg:min-h-0">
       <div className="border-b border-border px-4 py-3">
         <h2 className="text-sm font-semibold">Place Order</h2>
         <p className="mt-1 text-xs text-text-muted">{selectedMarket}</p>
       </div>
-
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
         <div className="grid grid-cols-2 gap-2">
           <button

@@ -6,7 +6,6 @@ import { OpenOrdersTab } from "./OpenOrdersTab";
 import { FillHistoryTab } from "./FillHistoryTab";
 import { BalancesTab } from "./BalancesTab";
 
-
 const tabs: {
   id: BottomTab;
   label: string;
@@ -23,7 +22,7 @@ export function BottomTabs() {
   const setBottomTab = useUiStore((state) => state.setBottomTab);
 
   return (
-    <section className="h-56 shrink-0 rounded-md border border-border bg-surface">
+    <section className="h-72 shrink-0 rounded-md border border-border bg-surface lg:h-56">
       <div className="flex h-10 items-center gap-1 border-b border-border px-2">
         {tabs.map((tab) => (
           <button
@@ -39,7 +38,6 @@ export function BottomTabs() {
           </button>
         ))}
       </div>
-
       <div className="h-[calc(100%-40px)] overflow-auto">
         {activeTab === "balances" && <BalancesTab />}
         {activeTab === "positions" && <PositionsTab />}
