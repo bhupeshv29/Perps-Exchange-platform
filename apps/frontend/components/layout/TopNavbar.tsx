@@ -2,6 +2,7 @@
 
 import { useTradeStore } from "@/stores/trade-store";
 import { useWsStore } from "@/stores/ws-store";
+import { ProfileDropdown } from "../account/ProfileDropDown";
 
 export function TopNavbar() {
   const selectedMarket = useTradeStore((state) => state.selectedMarket);
@@ -35,9 +36,7 @@ export function TopNavbar() {
           {connected ? "● Connected" : "● Offline"}
         </span>
 
-        <button className="rounded-md border border-border bg-surface-secondary px-4 py-2 text-sm hover:bg-surface-hover">
-          Profile
-        </button>
+        <ProfileDropdown />
       </div>
     </header>
   );

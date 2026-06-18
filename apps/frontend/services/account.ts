@@ -1,18 +1,24 @@
 import { api } from "@/lib/api";
 
 export async function getBalance() {
-  const response = await api.get("/balance");
-  return response.data;
+  const { data } = await api.get("/account/balance");
+  return data;
 }
 
-export async function getPosition() {
-  const response = await api.get("/position");
-  return response.data;
+export async function getPositions() {
+  const { data } = await api.get("/account/positions");
+  return data;
+}
+
+export async function getFills() {
+  const { data } = await api.get("/account/fills");
+  return data;
 }
 
 export async function deposit(amount: number) {
-  const response = await api.post("/onramp", {
+  const { data } = await api.post("/account/on-ramp", {
     amount,
   });
-  return response.data;
+
+  return data;
 }

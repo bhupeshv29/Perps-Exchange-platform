@@ -1,5 +1,5 @@
+import { AuthGuard } from "@/components/auth/AuthGuard";
 import { TradingLayout } from "@/components/layout/TradingLayout";
-
 
 type Props = {
   params: Promise<{
@@ -9,7 +9,11 @@ type Props = {
 
 async function TradePage({ params }: Props) {
   const { marketId } = await params;
-  return <TradingLayout marketId = {marketId}/>;
+  return (
+    <AuthGuard>
+      <TradingLayout marketId={marketId} />;
+    </AuthGuard>
+  );
 }
 
 export default TradePage;

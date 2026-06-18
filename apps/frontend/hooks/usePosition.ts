@@ -1,9 +1,9 @@
-import { getBalance, getPosition } from "@/services/account";
+import { getPositions } from "@/services/account";
 import { useQuery } from "@tanstack/react-query";
 
-export function usePosition() {
+export function usePositions() {
   return useQuery({
     queryKey: ["positions"],
-    queryFn: getPosition,
+    queryFn: getPositions,
   });
 }

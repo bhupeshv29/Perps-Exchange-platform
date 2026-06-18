@@ -6,6 +6,7 @@ import { DepthPanel } from "../trade/DepthPanel";
 import { OrderForm } from "../trade/OrderForm";
 import { TopNavbar } from "./TopNavbar";
 import { useEffect } from "react";
+import { DepositModal } from "../account/DepositModel";
 
 type Props = {
   marketId: string;
@@ -31,7 +32,8 @@ export function TradingLayout({ marketId }: Props) {
           <BottomTabs />
         </section>
 
-        <OrderForm marketId={marketId} />
+        <OrderForm />
+        <DepositModal />
       </div>
     </main>
   );

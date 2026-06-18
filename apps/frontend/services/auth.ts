@@ -20,9 +20,9 @@ export async function signUp(data: SignUpInput) {
   return response.data;
 }
 
-export async function signOut(data: SignInInput) {
-  const response = await api.post("auth/logout");
-  return response.data;
+export async function signOut() {
+  const { data } = await api.post("/auth/logout");
+  return data;
 }
 
 export async function getMe(data: SignInInput) {
