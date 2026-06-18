@@ -6,7 +6,7 @@ async function main() {
   await connectRedis();
 
   setInterval(async () => {
-    const price = 100000 + Math.floor(Math.random() * 1000);
+    const price = 100000 + Math.floor(Math.random() * 100);
 
     await publishStreamMessage(redis, STREAMS.PRICE_UPDATES, {
       marketId: "BTCUSDT",
