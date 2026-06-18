@@ -18,6 +18,8 @@ export function useCancelOrder() {
 
       queryClient.invalidateQueries({ queryKey: ["balance"] });
       queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: ["positions"] });
+      queryClient.invalidateQueries({ queryKey: ["fills"] });
     },
 
     onError: () => {

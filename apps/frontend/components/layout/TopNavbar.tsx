@@ -35,12 +35,16 @@ export function TopNavbar() {
 
         <div>
           <p className="text-xs text-text-muted">Last Price</p>
-          <p className="font-mono text-sm">{lastTradePrice.toFixed(2)}</p>
+          <p className="font-mono text-sm">
+            {lastTradePrice ? lastTradePrice.toFixed(2) : "-"}
+          </p>
         </div>
 
         <div>
           <p className="text-xs text-text-muted">Mark Price</p>
-          <p className="font-mono text-sm">{markPrice.toFixed(2)}</p>
+          <p className="font-mono text-sm">
+            {markPrice ? markPrice.toFixed(2) : "-"}
+          </p>
         </div>
       </div>
       <div className="flex items-center gap-4">
