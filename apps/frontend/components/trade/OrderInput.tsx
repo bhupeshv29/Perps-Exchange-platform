@@ -21,14 +21,14 @@ export function OrderInput({
 }: Props) {
   return (
     <div className="space-y-1">
-      <label className="text-xs text-text-muted">{label}</label>
+      <label className="text-[11px] text-text-muted">{label}</label>
 
       <div className="flex items-center rounded-md border border-border bg-background focus-within:border-primary">
         <input
           type={type}
           min={type === "number" ? 1 : undefined}
           placeholder={placeholder}
-          className="w-full bg-transparent px-3 py-2 text-sm outline-none"
+          className="w-full bg-transparent px-2 py-1.5 text-sm outline-none"
           onWheel={(e) => e.currentTarget.blur()}
           onKeyDown={(e) => {
             if (type !== "number") return;
@@ -40,7 +40,7 @@ export function OrderInput({
         />
 
         {suffix && (
-          <span className="px-3 text-xs text-text-muted">{suffix}</span>
+          <span className="px-2 text-[11px] text-text-muted">{suffix}</span>
         )}
       </div>
 

@@ -3,29 +3,29 @@ type Props = {
   price: number;
   qty: number;
   total: number;
-  maxQty: number;
+  maxTotal: number;
 };
 
-export function DepthRow({ side, price, qty, total, maxQty }: Props) {
-  const percentage = (qty / maxQty) * 100;
+export function DepthRow({ side, price, qty, total, maxTotal }: Props) {
+  const percentage = Math.min((total / maxTotal) * 100, 100);
 
   return (
     <div className="relative overflow-hidden">
       <div
-        className={`absolute right-0 top-0 bottom-0 opacity-20 transition-all duration-200 ${
-          side === "ASK" ? "bg-ask" : "bg-bid"
+        className={`absolute inset-y-0 right-0 transition-all duration-300 ${
+          side === "ASK" ? "bg-ask/15" : "bg-bid/15"
         }`}
         style={{
           width: `${percentage}%`,
         }}
       />
 
-      <div className="relative z-10 grid grid-cols-3 px-2 py-0.5 text-xs font-mono hover:bg-surface-hover">
+      <div className="relative z-10 grid grid-cols-3 px-2 py-0.5 font-mono text-xs transition-colors hover:bg-white/5">
         <span className={side === "ASK" ? "text-ask" : "text-bid"}>
           {price.toFixed(2)}
         </span>
 
-        <span className="text-right">{qty.toFixed(3)}</span>
+        <span className="text-right text-text-secondary">{qty.toFixed(3)}</span>
 
         <span className="text-right text-text-muted">{total.toFixed(3)}</span>
       </div>

@@ -26,7 +26,7 @@ export class WebSocketManager {
 
     this.ws.onopen = () => {
       useWsStore.getState().setConnected(true);
-      console.log("ws connected");
+       console.log("ws connected");
 
       if (this.currentMarket) {
         this.send({
@@ -43,12 +43,12 @@ export class WebSocketManager {
     this.ws.onclose = () => {
       useWsStore.getState().setConnected(false);
       this.ws = null;
-      console.log("ws disconnected");
+       console.log("ws disconnected");
     };
 
     this.ws.onerror = () => {
       useWsStore.getState().setConnected(false);
-      console.log("ws error");
+       console.log("ws error");
     };
   }
 
@@ -142,7 +142,7 @@ export class WebSocketManager {
           return;
       }
     } catch (error) {
-      console.error("failed to handle ws message", error);
+       console.error("failed to handle ws message", error);
     }
   }
 }

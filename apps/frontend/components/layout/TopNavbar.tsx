@@ -17,7 +17,8 @@ export function TopNavbar() {
     router.push(`/trade/${marketId}`);
   }
   return (
-    <header className="flex h-14 items-center justify-between border-b border-border bg-surface px-4">
+    <header className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-border bg-surface px-4 py-2">
+      {" "}
       <div className="flex items-center gap-8">
         <div>
           <p className="text-xs text-text-muted">Market</p>
@@ -42,7 +43,6 @@ export function TopNavbar() {
           <p className="font-mono text-sm">{markPrice.toFixed(2)}</p>
         </div>
       </div>
-
       <div className="flex items-center gap-4">
         <span
           className={connected ? "text-xs text-success" : "text-xs text-danger"}

@@ -42,17 +42,21 @@ export function OrderForm() {
   }
 
   return (
-    <aside className="rounded-md border border-border bg-surface lg:min-h-0">
-      <div className="border-b border-border px-4 py-3">
+    <aside className="flex h-full min-h-0 flex-col rounded-md border border-border bg-surface">
+      <div className="shrink-0 border-b border-border px-3 py-2">
         <h2 className="text-sm font-semibold">Place Order</h2>
-        <p className="mt-1 text-xs text-text-muted">{selectedMarket}</p>
+        <p className="text-xs text-text-muted">{selectedMarket}</p>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 p-4">
-        <div className="grid grid-cols-2 gap-2">
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden p-3"
+      >
+        <div className="grid shrink-0 grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => setValue("side", "BID")}
-            className={`rounded-md py-2 text-sm font-medium ${
+            className={`rounded-md py-1.5 text-sm font-medium ${
               side === "BID" ? "bg-bid text-black" : "bg-surface-secondary"
             }`}
           >
@@ -62,7 +66,7 @@ export function OrderForm() {
           <button
             type="button"
             onClick={() => setValue("side", "ASK")}
-            className={`rounded-md py-2 text-sm font-medium ${
+            className={`rounded-md py-1.5 text-sm font-medium ${
               side === "ASK" ? "bg-ask text-white" : "bg-surface-secondary"
             }`}
           >
@@ -70,14 +74,14 @@ export function OrderForm() {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="flex shrink-0 items-center gap-1 border-b border-border pb-2">
           <button
             type="button"
             onClick={() => setValue("orderType", "LIMIT")}
-            className={`rounded-md py-2 text-sm ${
+            className={`rounded px-3 py-1.5 text-xs ${
               orderType === "LIMIT"
-                ? "bg-primary text-white"
-                : "bg-surface-secondary"
+                ? "bg-surface-secondary ring-1 ring-blue-300 text-text-primary"
+                : "text-text-muted hover:bg-surface-hover"
             }`}
           >
             Limit
@@ -86,56 +90,59 @@ export function OrderForm() {
           <button
             type="button"
             onClick={() => setValue("orderType", "MARKET")}
-            className={`rounded-md py-2 text-sm ${
+            className={`rounded px-3 py-1.5 text-xs ${
               orderType === "MARKET"
-                ? "bg-primary text-white"
-                : "bg-surface-secondary"
+                ? "bg-surface-secondary ring-1 ring-blue-300 text-text-primary"
+                : "text-text-muted hover:bg-surface-hover"
             }`}
           >
             Market
           </button>
         </div>
+        <div className="min-h-0 space-y-2 overflow-hidden">
+          {orderType === "LIMIT" && (
+            <OrderInput
+              label="Price"
+              suffix="USDT"
+              registration={register("price", { valueAsNumber: true })}
+              error={errors.price}
+            />
+          )}
 
-        {orderType === "LIMIT" && (
           <OrderInput
-            label="Price"
-            suffix="USDT"
-            registration={register("price", { valueAsNumber: true })}
-            error={errors.price}
+            label="Quantity"
+            suffix="BTC"
+            registration={register("qty", { valueAsNumber: true })}
+            error={errors.qty}
           />
-        )}
 
-        <OrderInput
-          label="Quantity"
-          suffix="BTC"
-          registration={register("qty", { valueAsNumber: true })}
-          error={errors.qty}
-        />
+          <OrderInput
+            label="Margin"
+            suffix="USDT"
+            registration={register("margin", { valueAsNumber: true })}
+            error={errors.margin}
+          />
 
-        <OrderInput
-          label="Margin"
-          suffix="USDT"
-          registration={register("margin", { valueAsNumber: true })}
-          error={errors.margin}
-        />
+          <OrderInput
+            label="Leverage"
+            suffix="x"
+            registration={register("leverage", { valueAsNumber: true })}
+            error={errors.leverage}
+          />
+        </div>
 
-        <OrderInput
-          label="Leverage"
-          suffix="x"
-          registration={register("leverage", { valueAsNumber: true })}
-          error={errors.leverage}
-        />
-
-        <OrderSummary
-          available={available}
-          margin={margin ?? 0}
-          leverage={leverage ?? 1}
-        />
+        <div className="shrink-0">
+          <OrderSummary
+            available={available}
+            margin={margin ?? 0}
+            leverage={leverage ?? 1}
+          />
+        </div>
 
         <button
           type="submit"
           disabled={mutation.isPending}
-          className={`w-full rounded-md py-3 font-semibold disabled:opacity-60 ${
+          className={`shrink-0 rounded-md py-2 text-sm font-semibold disabled:opacity-60 ${
             side === "BID" ? "bg-bid text-black" : "bg-ask text-white"
           }`}
         >
@@ -147,7 +154,7 @@ export function OrderForm() {
         </button>
 
         {mutation.isError && (
-          <p className="text-center text-sm text-danger">
+          <p className="shrink-0 text-center text-xs text-danger">
             Failed to create order.
           </p>
         )}

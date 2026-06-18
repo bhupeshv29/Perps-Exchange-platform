@@ -117,14 +117,14 @@ export function ChartPanel() {
   }, [selectedMarket]);
 
   return (
-    <section className="min-h-0 rounded-md border border-border bg-surface">
-      <div className="flex h-10 items-center justify-between border-b border-border px-3">
+    <section className="flex h-full min-h-0 flex-col rounded-md border border-border bg-surface">
+      <div className="flex h-10 shrink-0 items-center justify-between border-b border-border px-3">
         <p className="text-sm font-medium">{selectedMarket} Chart</p>
 
         <span className="text-xs text-text-muted">1m fake candles</span>
       </div>
 
-      <div ref={containerRef} className="h-[calc(100%-40px)] w-full" />
+      <div ref={containerRef} className="min-h-0 flex-1" />
     </section>
   );
 }

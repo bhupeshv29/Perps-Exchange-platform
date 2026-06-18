@@ -5,12 +5,10 @@ import { useTradeStore } from "@/stores/trade-store";
 import { DepthRow } from "./DepthRow";
 import { TradesPanel } from "./TradesPanel";
 
-function buildDepthRows(levels: [number, number][], reverse = false) {
-  const rows = reverse ? [...levels].reverse() : [...levels];
-
+function buildDepthRows(levels: [number, number][]) {
   let cumulative = 0;
 
-  return rows.map(([price, qty]) => {
+  return levels.map(([price, qty]) => {
     cumulative += qty;
 
     return {
@@ -26,6 +24,7 @@ export function DepthPanel() {
 
   const depth = useTradeStore((state) => state.depth);
   const lastTradePrice = useTradeStore((state) => state.lastTradePrice);
+
   if (!depth) {
     return (
       <section className="flex h-full flex-col rounded-md border border-border bg-surface">
@@ -45,14 +44,19 @@ export function DepthPanel() {
     );
   }
 
-  const asks = depth.asks;
-  const bids = depth.bids;
+  const asksAsc = depth.asks.slice(0, 10); // best ask first
+  const bidsDesc = depth.bids.slice(0, 10); // best bid first
 
-  const askRows = buildDepthRows(asks.slice(0, 10), true);
-  const bidRows = buildDepthRows(bids.slice(0, 10));
+  // Build cumulative from spread outward
+  const askRowsFromSpread = buildDepthRows(asksAsc);
 
-  const maxAskQty = asks.length ? Math.max(...asks.map(([, qty]) => qty)) : 1;
-  const maxBidQty = bids.length ? Math.max(...bids.map(([, qty]) => qty)) : 1;
+  // Display asks high -> low, so best ask is nearest last trade price
+  const askRows = [...askRowsFromSpread].reverse();
+
+  const bidRows = buildDepthRows(bidsDesc);
+
+  const maxAskTotal = askRowsFromSpread.at(-1)?.total ?? 1;
+  const maxBidTotal = bidRows.at(-1)?.total ?? 1;
 
   return (
     <section className="flex h-full flex-col rounded-md border border-border bg-surface">
@@ -90,7 +94,7 @@ export function DepthPanel() {
             <span className="text-right">Total</span>
           </div>
 
-          <div className="flex-1 overflow-hidden">
+          <div className="flex flex-1 flex-col justify-end overflow-hidden">
             {askRows.map((row) => (
               <DepthRow
                 key={row.price}
@@ -98,18 +102,22 @@ export function DepthPanel() {
                 price={row.price}
                 qty={row.qty}
                 total={row.total}
-                maxQty={maxAskQty}
+                maxTotal={maxAskTotal}
               />
             ))}
           </div>
 
-          <div className="border-y border-border py-2 text-center">
-            <p className="font-mono text-sm font-semibold">
+          <div className="border-y border-border bg-background py-0.2 text-center">
+            <p className="font-mono text-xs font-semibold text-text-primary">
               {lastTradePrice.toFixed(2)}
+            </p>
+
+            <p className="mt-0.5 text-[10px] uppercase tracking-wide text-text-muted">
+              Last Trade Price
             </p>
           </div>
 
-          <div className="flex-1 overflow-hidden">
+          <div className="flex flex-1 flex-col overflow-hidden">
             {bidRows.map((row) => (
               <DepthRow
                 key={row.price}
@@ -117,7 +125,7 @@ export function DepthPanel() {
                 price={row.price}
                 qty={row.qty}
                 total={row.total}
-                maxQty={maxBidQty}
+                maxTotal={maxBidTotal}
               />
             ))}
           </div>
