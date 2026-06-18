@@ -4,6 +4,7 @@ import "./globals.css";
 import { QueryProvider } from "@/providers/QueryProvider";
 import { WebSocketProvider } from "@/providers/WebSocketProvider";
 import { AccountDataProvider } from "@/providers/AccountDataProvider";
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,7 +32,30 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <QueryProvider>{children}</QueryProvider>
+        <QueryProvider>
+          {children}
+          <Toaster
+            position="bottom-right"
+            richColors
+            closeButton
+            expand
+            visibleToasts={4}
+            toastOptions={{
+              duration: 1000,
+              classNames: {
+                toast:
+                  "bg-surface border border-border text-text-primary shadow-xl rounded-xl",
+                title: "font-semibold text-sm",
+                description: "text-xs text-text-secondary",
+                actionButton:
+                  "bg-primary text-white hover:bg-primary-hover rounded-md",
+                cancelButton: "bg-surface-hover text-text-primary rounded-md",
+                closeButton:
+                  "bg-surface-hover border-border text-text-secondary hover:text-white",
+              },
+            }}
+          />
+        </QueryProvider>
       </body>
     </html>
   );

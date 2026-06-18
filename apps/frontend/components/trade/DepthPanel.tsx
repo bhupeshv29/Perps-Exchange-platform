@@ -28,8 +28,19 @@ export function DepthPanel() {
   const lastTradePrice = useTradeStore((state) => state.lastTradePrice);
   if (!depth) {
     return (
-      <section className="flex h-full items-center justify-center rounded-md border border-border bg-surface">
-        <p className="text-sm text-text-muted">Loading orderbook...</p>
+      <section className="flex h-full flex-col rounded-md border border-border bg-surface">
+        <div className="h-10 border-b border-border px-3 py-3">
+          <div className="h-4 w-24 animate-pulse rounded bg-surface-secondary" />
+        </div>
+
+        <div className="space-y-2 p-3">
+          {Array.from({ length: 18 }).map((_, index) => (
+            <div
+              key={index}
+              className="h-4 animate-pulse rounded bg-surface-secondary"
+            />
+          ))}
+        </div>
       </section>
     );
   }

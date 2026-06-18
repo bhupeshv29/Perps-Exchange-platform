@@ -198,3 +198,43 @@ making frontend
 That avoids showing “Loading…” forever if a market genuinely has no orders.
 For now, the simple if (!depth) is perfectly fine. Later, when you add MarketDataProvider, you can enhance it to use the query’s loading state.
 
+
+            #charts commit
+            Perfect. 🎉
+
+            At this point, your frontend has reached a stage where it actually resembles a real exchange terminal.
+
+            What you’ve built so far
+
+                - Authentication (signin/signup)
+                - Trading layout
+                - Navbar
+                - Market switching
+                - Orderbook
+                - Trade history
+                - TradingView Lightweight Charts
+                - Order form
+                - Deposit modal
+                - Bottom tabs
+                - React Query
+                - Zustand
+                - WebSocket manager
+                - Live market updates
+                - Live account updates
+                - Professional dark theme
+
+            This is already a solid foundation.
+
+
+next feat ->
+        5 stop scrolling behaviour in form fields in order form
+
+        6. Toast notifications
+
+        7. Loading skeletons
+
+        8. PnL calculation
+
+        9. Position liquidation price
+
+        10. Responsive layout

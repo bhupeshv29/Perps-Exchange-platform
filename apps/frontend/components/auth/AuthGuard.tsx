@@ -17,8 +17,11 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
 
   if (isLoading) {
     return (
-      <main className="flex h-screen items-center justify-center bg-background text-text-muted">
-        Loading trading terminal...
+      <main className="flex h-screen items-center justify-center bg-background">
+        <div className="space-y-3">
+          <div className="h-4 w-48 animate-pulse rounded bg-surface-secondary" />
+          <div className="h-4 w-32 animate-pulse rounded bg-surface-secondary" />
+        </div>
       </main>
     );
   }

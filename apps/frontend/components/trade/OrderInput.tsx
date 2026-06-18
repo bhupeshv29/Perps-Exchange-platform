@@ -26,8 +26,16 @@ export function OrderInput({
       <div className="flex items-center rounded-md border border-border bg-background focus-within:border-primary">
         <input
           type={type}
+          min={type === "number" ? 1 : undefined}
           placeholder={placeholder}
           className="w-full bg-transparent px-3 py-2 text-sm outline-none"
+          onWheel={(e) => e.currentTarget.blur()}
+          onKeyDown={(e) => {
+            if (type !== "number") return;
+            if (["-", "e", "E"].includes(e.key)) {
+              e.preventDefault();
+            }
+          }}
           {...registration}
         />
 
