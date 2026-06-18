@@ -15,9 +15,17 @@ type Props = {
 export function TradingLayout({ marketId }: Props) {
   const setSelectedMarket = useTradeStore((state) => state.setSelectedMarket);
 
+  const resetDepth = useTradeStore((s) => s.resetDepth);
+  const resetTrades = useTradeStore((s) => s.resetTrades);
+  const resetPrices = useTradeStore((s) => s.resetPrices);
+
   useEffect(() => {
+    resetDepth();
+    resetTrades();
+    resetPrices();
+
     setSelectedMarket(marketId);
-  }, [marketId, setSelectedMarket]);
+  }, [marketId, setSelectedMarket, resetDepth, resetTrades, resetPrices]);
   return (
     <main className="flex h-screen flex-col overflow-hidden bg-background text-text-primary">
       <TopNavbar />

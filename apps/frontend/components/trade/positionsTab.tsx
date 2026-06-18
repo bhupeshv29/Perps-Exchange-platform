@@ -1,15 +1,9 @@
 "use client";
 
-import { usePositions } from "@/hooks/usePosition";
+import { useAccountStore } from "@/stores/account-store";
 
 export function PositionsTab() {
-  const { data, isLoading } = usePositions();
-
-  const positions = data?.payload ?? [];
-
-  if (isLoading) {
-    return <EmptyState title="Loading positions..." />;
-  }
+  const positions = useAccountStore((state) => state.positions);
 
   if (positions.length === 0) {
     return <EmptyState title="No open positions" />;
@@ -33,19 +27,15 @@ export function PositionsTab() {
           className="grid grid-cols-7 px-4 py-3 font-mono text-xs hover:bg-surface-hover"
         >
           <span>{position.marketId}</span>
-
           <span className={position.side === "LONG" ? "text-bid" : "text-ask"}>
             {position.side}
           </span>
-
           <span>{position.qty.toFixed(3)}</span>
           <span>{position.entryPrice.toFixed(2)}</span>
           <span>{position.leverage}x</span>
-
           <span className={position.realizedPnl >= 0 ? "text-bid" : "text-ask"}>
             {position.realizedPnl.toFixed(2)}
           </span>
-
           <span className="text-right">{position.margin.toFixed(2)}</span>
         </div>
       ))}

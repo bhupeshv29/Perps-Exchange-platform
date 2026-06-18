@@ -112,9 +112,6 @@
     },
     "packages/common": {
       "name": "@repo/common",
-      "dependencies": {
-        "zod": "^4.4.3",
-      },
       "devDependencies": {
         "@types/bun": "latest",
       },

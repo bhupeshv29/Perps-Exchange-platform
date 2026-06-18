@@ -2,6 +2,7 @@ import type { WsEvent } from "@repo/common";
 
 import { useTradeStore } from "@/stores/trade-store";
 import { useWsStore } from "@/stores/ws-store";
+import { useAccountStore } from "@/stores/account-store";
 
 export class WebSocketManager {
   private static instance: WebSocketManager;
@@ -32,13 +33,10 @@ export class WebSocketManager {
           type: "SUBSCRIBE_MARKET",
           marketId: this.currentMarket,
         });
-
-        console.log("subscribed market", this.currentMarket);
       }
     };
 
     this.ws.onmessage = (event) => {
-      console.log("ws message", event.data);
       this.handleMessage(event.data);
     };
 
@@ -64,7 +62,6 @@ export class WebSocketManager {
     this.currentMarket = marketId;
 
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
-      console.log("market saved, will subscribe on open", marketId);
       return;
     }
 
@@ -72,8 +69,6 @@ export class WebSocketManager {
       type: "SUBSCRIBE_MARKET",
       marketId,
     });
-
-    console.log("subscribed market", marketId);
   }
 
   unsubscribeMarket(marketId: string) {
@@ -98,7 +93,9 @@ export class WebSocketManager {
   private handleMessage(raw: string) {
     try {
       const event = JSON.parse(raw) as WsEvent;
+
       const tradeStore = useTradeStore.getState();
+      const accountStore = useAccountStore.getState();
 
       switch (event.type) {
         case "DEPTH_UPDATE":
@@ -107,10 +104,38 @@ export class WebSocketManager {
 
         case "TRADE_UPDATE":
           tradeStore.addTrade(event.payload);
+          accountStore.addFill(event.payload);
           return;
 
         case "MARK_PRICE_UPDATE":
           tradeStore.setMarkPrice(event.payload.price);
+          return;
+
+        case "BALANCE_UPDATE":
+          accountStore.setBalance(event.payload);
+          return;
+
+        case "ORDER_UPDATE":
+          accountStore.updateOrder(event.payload);
+          return;
+
+        case "POSITION_UPDATE":
+          if (event.payload.qty === 0) {
+            accountStore.removePosition(
+              event.payload.marketId,
+              event.payload.side,
+            );
+            return;
+          }
+
+          accountStore.updatePosition(event.payload);
+          return;
+
+        case "POSITION_LIQUIDATED":
+          accountStore.removePosition(
+            event.payload.marketId,
+            event.payload.side,
+          );
           return;
 
         default:

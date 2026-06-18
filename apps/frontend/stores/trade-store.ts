@@ -13,6 +13,9 @@ type TradeStore = {
   setDepth: (depth: Depth) => void;
   addTrade: (trade: Fill) => void;
   setMarkPrice: (price: number) => void;
+  resetDepth: () => void;
+  resetTrades: () => void;
+  resetPrices: () => void;
 };
 
 export const useTradeStore = create<TradeStore>((set) => ({
@@ -42,5 +45,20 @@ export const useTradeStore = create<TradeStore>((set) => ({
   setMarkPrice: (markPrice) =>
     set({
       markPrice,
+    }),
+  resetDepth: () =>
+    set({
+      depth: null,
+    }),
+
+  resetTrades: () =>
+    set({
+      trades: [],
+    }),
+
+  resetPrices: () =>
+    set({
+      lastTradePrice: 0,
+      markPrice: 0,
     }),
 }));

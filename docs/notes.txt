@@ -188,3 +188,13 @@ making frontend
 1 remember taking type from common package zod infer
 2 nextjs, tailwind, shadcn, axios, zustand, tanstack query
 3 row color not applying
+4 toaster 
+5 GET /markets/:marketId/ticker
+    GET depth
+    GET ticker
+    then WS updates
+
+
+That avoids showing “Loading…” forever if a market genuinely has no orders.
+For now, the simple if (!depth) is perfectly fine. Later, when you add MarketDataProvider, you can enhance it to use the query’s loading state.
+

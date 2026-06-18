@@ -1,35 +1,15 @@
 "use client";
 
-import { useOrders } from "@/hooks/useOrders";
 import { useCancelOrder } from "@/hooks/useCancelOrder";
-
-type Order = {
-  id: string;
-  marketId: string;
-  side: "BID" | "ASK";
-  type: "LIMIT" | "MARKET";
-  status: "OPEN" | "PARTIALLY_FILLED" | "FILLED" | "CANCELLED" | "REJECTED";
-  price?: number | null;
-  qty: number;
-  filledQty: number;
-  margin: number;
-  leverage: number;
-  createdAt: string;
-};
+import { useAccountStore } from "@/stores/account-store";
 
 export function OpenOrdersTab() {
-  const { data, isLoading } = useOrders();
+  const orders = useAccountStore((state) => state.orders);
   const cancelMutation = useCancelOrder();
-
-  const orders: Order[] = data?.orders ?? [];
 
   const openOrders = orders.filter(
     (order) => order.status === "OPEN" || order.status === "PARTIALLY_FILLED",
   );
-
-  if (isLoading) {
-    return <EmptyState title="Loading open orders..." />;
-  }
 
   if (openOrders.length === 0) {
     return <EmptyState title="No open orders" />;

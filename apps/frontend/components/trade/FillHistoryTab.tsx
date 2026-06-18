@@ -1,27 +1,9 @@
 "use client";
 
-import { useFills } from "@/hooks/useFills";
-
-type Fill = {
-  id: string;
-  marketId: string;
-  makerOrderId: string;
-  takerOrderId: string;
-  makerUserId: string;
-  takerUserId: string;
-  price: number;
-  qty: number;
-  createdAt: string;
-};
+import { useAccountStore } from "@/stores/account-store";
 
 export function FillHistoryTab() {
-  const { data, isLoading } = useFills();
-
-  const fills: Fill[] = data?.fills ?? [];
-
-  if (isLoading) {
-    return <EmptyState title="Loading fills..." />;
-  }
+  const fills = useAccountStore((state) => state.fills);
 
   if (fills.length === 0) {
     return <EmptyState title="No fills yet" />;

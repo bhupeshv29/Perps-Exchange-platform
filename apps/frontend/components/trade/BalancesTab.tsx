@@ -1,24 +1,9 @@
 "use client";
 
-import { useBalance } from "@/hooks/useBalance";
-
-type BalanceResponse = {
-  type: "BALANCE";
-  payload: {
-    userId: string;
-    available: number;
-    locked: number;
-  };
-};
+import { useAccountStore } from "@/stores/account-store";
 
 export function BalancesTab() {
-  const { data, isLoading } = useBalance();
-
-  const balance = (data as BalanceResponse | undefined)?.payload;
-
-  if (isLoading) {
-    return <EmptyState title="Loading balance..." />;
-  }
+  const balance = useAccountStore((state) => state.balance);
 
   if (!balance) {
     return <EmptyState title="No balance found" />;
@@ -34,12 +19,8 @@ export function BalancesTab() {
 
       <div className="grid grid-cols-3 px-4 py-3 font-mono text-xs hover:bg-surface-hover">
         <span>USDT</span>
-
         <span>{balance.available.toFixed(2)}</span>
-
-        <span className="text-right">
-          {balance.locked.toFixed(2)}
-        </span>
+        <span className="text-right">{balance.locked.toFixed(2)}</span>
       </div>
     </>
   );
