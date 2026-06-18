@@ -2,15 +2,17 @@ type Props = {
   side: "ASK" | "BID";
   price: number;
   qty: number;
+  total: number;
   maxQty: number;
 };
-export function DepthRow({ side, price, qty, maxQty }: Props) {
+
+export function DepthRow({ side, price, qty, total, maxQty }: Props) {
   const percentage = (qty / maxQty) * 100;
 
   return (
-    <div className="relative">
+    <div className="relative overflow-hidden">
       <div
-        className={`absolute right-0 top-0 bottom-0 opacity-20 ${
+        className={`absolute right-0 top-0 bottom-0 opacity-20 transition-all duration-200 ${
           side === "ASK" ? "bg-ask" : "bg-bid"
         }`}
         style={{
@@ -25,9 +27,7 @@ export function DepthRow({ side, price, qty, maxQty }: Props) {
 
         <span className="text-right">{qty.toFixed(3)}</span>
 
-        <span className="text-right text-text-muted">
-          {(price * qty).toFixed(2)}
-        </span>
+        <span className="text-right text-text-muted">{total.toFixed(3)}</span>
       </div>
     </div>
   );
