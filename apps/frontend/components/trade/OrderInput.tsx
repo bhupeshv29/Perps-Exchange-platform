@@ -27,6 +27,7 @@ export function OrderInput({
         <input
           type={type}
           min={type === "number" ? 0 : undefined}
+          step={type === "number" ? "any" : undefined}
           placeholder={placeholder}
           className="w-full bg-transparent px-2 py-1.5 text-sm outline-none"
           onWheel={(e) => e.currentTarget.blur()}

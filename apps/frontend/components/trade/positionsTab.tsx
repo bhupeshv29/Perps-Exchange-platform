@@ -1,16 +1,11 @@
 "use client";
 
+import { useCreateOrder } from "@/hooks/useCreateOrder";
 import { useAccountStore } from "@/stores/account-store";
-import { useTradeStore } from "@/stores/trade-store";
-import {
-  calculateLiquidationPrice,
-  calculateRoi,
-  calculateUnrealizedPnl,
-} from "@/utils/position";
 
 export function PositionsTab() {
   const positions = useAccountStore((state) => state.positions);
-  const markPrice = useTradeStore((state) => state.markPrice);
+  const closeMutation = useCreateOrder();
 
   if (positions.length === 0) {
     return <EmptyState title="No open positions" />;
@@ -18,27 +13,27 @@ export function PositionsTab() {
 
   return (
     <>
-      <div className="grid grid-cols-9 border-b border-border px-4 py-2 text-xs text-text-muted">
+      <div className="grid grid-cols-11 border-b border-border px-4 py-2 text-xs text-text-muted">
         <span>Market</span>
         <span>Side</span>
         <span>Qty</span>
         <span>Entry</span>
-        <span>Mark</span>
         <span>Liq.</span>
         <span>PnL</span>
         <span>ROI</span>
-        <span className="text-right">Margin</span>
+        <span>Equity</span>
+        <span>Lev.</span>
+        <span>Margin</span>
+        <span className="text-right">Action</span>
       </div>
 
       {positions.map((position) => {
-        const unrealizedPnl = calculateUnrealizedPnl(position, markPrice);
-        const roi = calculateRoi(position, unrealizedPnl);
-        const liquidationPrice = calculateLiquidationPrice(position);
+        const closeSide = position.side === "LONG" ? "ASK" : "BID";
 
         return (
           <div
             key={`${position.userId}-${position.marketId}-${position.side}`}
-            className="grid grid-cols-9 px-4 py-3 font-mono text-xs hover:bg-surface-hover"
+            className="grid grid-cols-11 px-4 py-3 font-mono text-xs hover:bg-surface-hover"
           >
             <span>{position.marketId}</span>
 
@@ -50,18 +45,41 @@ export function PositionsTab() {
 
             <span>{position.qty.toFixed(3)}</span>
             <span>{position.entryPrice.toFixed(2)}</span>
-            <span>{markPrice ? markPrice.toFixed(2) : "-"}</span>
-            <span className="text-warning">{liquidationPrice.toFixed(2)}</span>
 
-            <span className={unrealizedPnl >= 0 ? "text-bid" : "text-ask"}>
-              {unrealizedPnl.toFixed(2)}
+            <span className="text-warning">
+              {position.liquidationPrice.toFixed(2)}
             </span>
 
-            <span className={roi >= 0 ? "text-bid" : "text-ask"}>
-              {roi.toFixed(2)}%
+            <span
+              className={position.unrealizedPnl >= 0 ? "text-bid" : "text-ask"}
+            >
+              {position.unrealizedPnl.toFixed(2)}
             </span>
 
-            <span className="text-right">{position.margin.toFixed(2)}</span>
+            <span className={position.roi >= 0 ? "text-bid" : "text-ask"}>
+              {position.roi.toFixed(2)}%
+            </span>
+
+            <span>{position.equity.toFixed(2)}</span>
+            <span>{position.leverage}x</span>
+            <span>{position.margin.toFixed(2)}</span>
+
+            <button
+              disabled={closeMutation.isPending}
+              onClick={() =>
+                closeMutation.mutate({
+                  marketId: position.marketId,
+                  side: closeSide,
+                  orderType: "MARKET",
+                  qty: position.qty,
+                  leverage: position.leverage,
+                  reduceOnly: true,
+                })
+              }
+              className="text-right text-danger hover:underline disabled:opacity-50"
+            >
+              Close
+            </button>
           </div>
         );
       })}

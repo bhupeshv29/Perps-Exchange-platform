@@ -21,6 +21,7 @@ export async function handleDbEvent(event: DbEvent) {
           filledQty: order.filledQty,
           margin: order.margin,
           leverage: order.leverage,
+          reduceOnly: order.reduceOnly ?? false,
         },
         create: {
           id: order.id,
@@ -34,6 +35,7 @@ export async function handleDbEvent(event: DbEvent) {
           filledQty: order.filledQty,
           margin: order.margin,
           leverage: order.leverage,
+          reduceOnly: order.reduceOnly ?? false,
           createdAt: new Date(order.createdAt),
         },
       });
@@ -55,6 +57,7 @@ export async function handleDbEvent(event: DbEvent) {
           qty: order.qty,
           margin: order.margin,
           leverage: order.leverage,
+          reduceOnly: order.reduceOnly ?? false,
         },
       });
 

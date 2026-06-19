@@ -6,11 +6,14 @@ import type {
   Order,
   Position,
 } from "@repo/common";
+import { getMarketConfig } from "@repo/common";
 
-import { balances, orders } from "../state/state";
+import { balances, orders, positions, getPositionKey } from "../state/state";
 
 import {
   addOrderToBook,
+  getBestAskPrice,
+  getBestBidPrice,
   getDepth,
   getOrCreateOrderbook,
   updateOrderStatus,
@@ -21,10 +24,10 @@ import { matchAsk, matchBid } from "../orderbook/match";
 import {
   applyFillsToPositions,
   getProportionalMargin,
+  getPositionSide,
 } from "../position/position";
 
 import { publishDbEvent, publishWsEvent } from "../publish/events";
-import { getMarketConfig } from "@repo/common";
 
 function reject(requestId: string, error: string): EngineResponse {
   return {
@@ -34,8 +37,49 @@ function reject(requestId: string, error: string): EngineResponse {
   };
 }
 
+function getOppositePositionForReduceOnly(orderInput: {
+  userId: string;
+  marketId: string;
+  side: Order["side"];
+}) {
+  const incomingSide = getPositionSide(orderInput.side);
+  const oppositeSide = incomingSide === "LONG" ? "SHORT" : "LONG";
+
+  return positions[
+    getPositionKey(orderInput.userId, orderInput.marketId, oppositeSide)
+  ];
+}
+
+function getExecutionPriceForMargin(input: {
+  orderType: Order["type"];
+  price?: number;
+  side: Order["side"];
+  book: ReturnType<typeof getOrCreateOrderbook>;
+}): number | null {
+  if (input.orderType === "LIMIT") {
+    return input.price ?? null;
+  }
+
+  if (input.side === "BID") {
+    return getBestAskPrice(input.book);
+  }
+
+  return getBestBidPrice(input.book);
+}
+
+function calculateOrderMargin(input: {
+  price: number;
+  qty: number;
+  leverage: number;
+  qtyScale: number;
+}): number {
+  const positionValue = Math.floor((input.price * input.qty) / input.qtyScale);
+  return Math.floor(positionValue / input.leverage);
+}
+
 function buildOrder(
   payload: Extract<EngineRequest, { type: "CREATE_ORDER" }>["payload"],
+  margin: number,
 ): Order {
   return {
     id: randomUUID(),
@@ -51,9 +95,9 @@ function buildOrder(
     qty: payload.qty,
     filledQty: 0,
 
-    margin: payload.margin,
+    margin,
     leverage: payload.leverage,
-
+    reduceOnly: payload.reduceOnly ?? false,
     status: "OPEN",
 
     createdAt: Date.now(),
@@ -66,7 +110,6 @@ function releaseUnfilledMargin(order: Order) {
   if (!balance) return;
 
   const filledMargin = getProportionalMargin(order, order.filledQty);
-
   const unusedMargin = order.margin - filledMargin;
 
   if (unusedMargin <= 0) return;
@@ -94,7 +137,6 @@ async function publishFills(fills: Fill[], marketId: string) {
 
 async function publishPositions(positions: Position[]) {
   for (const position of positions) {
-
     void publishWsEvent({
       type: "POSITION_UPDATE",
       userId: position.userId,
@@ -107,8 +149,16 @@ async function publishPositions(positions: Position[]) {
 export async function processCreateOrder(
   request: Extract<EngineRequest, { type: "CREATE_ORDER" }>,
 ): Promise<EngineResponse> {
-  const { userId, marketId, side, orderType, price, qty, margin, leverage } =
-    request.payload;
+  const {
+    userId,
+    marketId,
+    side,
+    orderType,
+    price,
+    qty,
+    leverage,
+    reduceOnly,
+  } = request.payload;
 
   const market = getMarketConfig(marketId);
 
@@ -120,24 +170,67 @@ export async function processCreateOrder(
     return reject(request.requestId, "leverage too high for market");
   }
 
+  if (orderType === "LIMIT" && price === undefined) {
+    return reject(request.requestId, "limit order price is required");
+  }
+
+  const book = getOrCreateOrderbook(marketId);
+
+  const executionPrice = getExecutionPriceForMargin({
+    orderType,
+    price,
+    side,
+    book,
+  });
+
+  if (!executionPrice) {
+    return reject(request.requestId, "no liquidity for market order");
+  }
+
+  if (reduceOnly) {
+    const oppositePosition = getOppositePositionForReduceOnly({
+      userId,
+      marketId,
+      side,
+    });
+
+    if (!oppositePosition) {
+      return reject(request.requestId, "no position to reduce");
+    }
+
+    if (qty > oppositePosition.qty) {
+      return reject(request.requestId, "reduce only qty exceeds position size");
+    }
+  }
+
+  const margin = reduceOnly
+    ? 0
+    : calculateOrderMargin({
+        price: executionPrice,
+        qty,
+        leverage,
+        qtyScale: market.qtyScale,
+      });
+
+  if (!reduceOnly && margin <= 0) {
+    return reject(request.requestId, "invalid margin");
+  }
   const balance = balances[userId];
 
   if (!balance) {
     return reject(request.requestId, "balance not found");
   }
 
-  if (balance.available < margin) {
+  if (!reduceOnly && balance.available < margin) {
     return reject(request.requestId, "insufficient balance");
   }
 
-  if (orderType === "LIMIT" && price === undefined) {
-    return reject(request.requestId, "limit order price is required");
+  if (!reduceOnly) {
+    balance.available -= margin;
+    balance.locked += margin;
   }
 
-  balance.available -= margin;
-  balance.locked += margin;
-
-  const order = buildOrder(request.payload);
+  const order = buildOrder(request.payload, margin);
 
   orders[order.id] = order;
 
@@ -147,18 +240,20 @@ export async function processCreateOrder(
     createdAt: Date.now(),
   });
 
-  const book = getOrCreateOrderbook(marketId);
-
   const fills = side === "BID" ? matchBid(book, order) : matchAsk(book, order);
 
   updateOrderStatus(order);
 
-  const { updatedPositions } = applyFillsToPositions(fills);
+  const { updatedPositions, closedPositions } = applyFillsToPositions(fills);
 
   const remainingQty = order.qty - order.filledQty;
 
   if (remainingQty > 0 && order.type === "LIMIT") {
-    addOrderToBook(order);
+    if (order.reduceOnly) {
+      order.status = order.filledQty > 0 ? "PARTIALLY_FILLED" : "REJECTED";
+    } else {
+      addOrderToBook(order);
+    }
   }
 
   if (remainingQty > 0 && order.type === "MARKET") {
@@ -198,8 +293,15 @@ export async function processCreateOrder(
   }
 
   await publishFills(fills, marketId);
-
   await publishPositions(updatedPositions);
+
+  for (const closedPosition of closedPositions) {
+    void publishDbEvent({
+      type: "CLOSED_POSITION_CREATED",
+      payload: closedPosition,
+      createdAt: Date.now(),
+    });
+  }
 
   void publishDbEvent({
     type: "ORDER_UPDATED",

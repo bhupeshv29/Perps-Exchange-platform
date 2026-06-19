@@ -19,22 +19,24 @@ function createFill(
 ): Fill {
   return {
     id: randomUUID(),
-
     marketId: takerOrder.marketId,
-
     makerOrderId: makerOrder.id,
-
     takerOrderId: takerOrder.id,
-
     makerUserId: makerOrder.userId,
-
     takerUserId: takerOrder.userId,
-
     price,
     qty,
 
     createdAt: Date.now(),
   };
+}
+
+function getFirstNonSelfOrder(
+  orders: Order[] | undefined,
+  takerOrder: Order,
+): Order | null {
+  if (!orders) return null;
+  return orders.find((order) => order.userId !== takerOrder.userId) ?? null;
 }
 
 export function matchBid(book: Orderbook, order: Order): Fill[] {
@@ -53,8 +55,7 @@ export function matchBid(book: Orderbook, order: Order): Fill[] {
 
     const askOrders = book.asks[bestAskPrice];
 
-    const makerOrder = askOrders?.[0];
-
+    const makerOrder = getFirstNonSelfOrder(askOrders, order);
     if (!makerOrder) {
       break;
     }
@@ -95,8 +96,7 @@ export function matchAsk(book: Orderbook, order: Order): Fill[] {
 
     const bidOrders = book.bids[bestBidPrice];
 
-    const makerOrder = bidOrders?.[0];
-
+    const makerOrder = getFirstNonSelfOrder(bidOrders, order);
     if (!makerOrder) {
       break;
     }

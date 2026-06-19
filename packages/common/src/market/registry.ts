@@ -7,7 +7,7 @@ export type MarketConfig = {
   qtyScale: number;
   balanceScale: number;
   maxLeverage: number;
-  isActive: Boolean;
+  isActive: boolean;
 };
 
 export const MARKETS: Record<string, MarketConfig> = {

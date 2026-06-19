@@ -8,7 +8,6 @@ export const orderFormSchema = z
     orderType: z.enum(["LIMIT", "MARKET"]),
     price: z.number().positive("Price must be greater than 0").optional(),
     qty: positiveNumber,
-    margin: positiveNumber,
     leverage: z.number().min(1).max(20),
   })
   .superRefine((data, ctx) => {
@@ -25,4 +24,5 @@ export type OrderFormInput = z.infer<typeof orderFormSchema>;
 
 export type CreateOrderInput = OrderFormInput & {
   marketId: string;
+  reduceOnly?: boolean;
 };

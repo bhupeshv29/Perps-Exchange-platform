@@ -66,6 +66,9 @@ export function removeFilledOrdersFromBook(book: Orderbook) {
   cleanupSide(book.asks);
 }
 
+
+// below 2 fn is depth only 
+
 function aggregateSide(sideBook: Record<number, Order[]>): [number, number][] {
   return Object.entries(sideBook)
     .map(([price, orders]) => {
@@ -90,6 +93,10 @@ export function getDepth(marketId: string): Depth {
     asks: aggregateSide(book.asks).sort((a, b) => a[0] - b[0]),
   };
 }
+
+
+
+//below 2 fn for matching
 
 export function getBestAskPrice(book: Orderbook): number | null {
   const prices = Object.keys(book.asks).map(Number);

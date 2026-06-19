@@ -33,8 +33,8 @@ orderRouter.post(
               ? undefined
               : scalePrice(body.marketId, body.price),
           qty: scaleQty(body.marketId, body.qty),
-          margin: scaleBalance(body.margin),
           leverage: body.leverage,
+          reduceOnly: body.reduceOnly,
         },
       });
 

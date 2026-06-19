@@ -3,12 +3,13 @@ import type { ClosedPosition } from "@repo/common";
 import { balances, markPrices, positions, getPositionKey } from "./state/state";
 
 import {
-  getEquity,
-  getMaintenanceMargin,
-  getUnrealizedPnl,
-} from "./position/pnl";
+  getEquityScaled,
+  getMaintenanceMarginScaled,
+  getUnrealizedPnlScaled,
+} from "@repo/common";
 
 import { publishDbEvent, publishWsEvent } from "./publish/events";
+import { updatePositionMetrics } from "./position/metrics";
 
 export async function checkLiquidations(marketId: string) {
   const markPrice = markPrices[marketId];
@@ -18,13 +19,28 @@ export async function checkLiquidations(marketId: string) {
   for (const position of Object.values(positions)) {
     if (position.marketId !== marketId) continue;
 
-    const equity = getEquity(position, markPrice);
-    const maintenanceMargin = getMaintenanceMargin(position);
+    updatePositionMetrics(position, markPrice);
 
-    if (equity > maintenanceMargin) continue;
+    const equity = getEquityScaled(position, markPrice);
+
+    const maintenanceMargin = getMaintenanceMarginScaled(position);
+
+    if (equity > maintenanceMargin) {
+      void publishWsEvent({
+        type: "POSITION_UPDATE",
+
+        userId: position.userId,
+
+        payload: position,
+
+        createdAt: Date.now(),
+      });
+
+      continue;
+    }
 
     const now = Date.now();
-    const realizedPnl = getUnrealizedPnl(position, markPrice);
+    const realizedPnl = getUnrealizedPnlScaled(position, markPrice);
 
     const positionKey = getPositionKey(
       position.userId,
@@ -84,16 +100,6 @@ export async function checkLiquidations(marketId: string) {
         side: position.side,
         qty: position.qty,
         price: markPrice,
-      },
-      createdAt: now,
-    });
-
-    void publishWsEvent({
-      type: "POSITION_UPDATE",
-      userId: position.userId,
-      payload: {
-        ...position,
-        qty: 0,
       },
       createdAt: now,
     });
