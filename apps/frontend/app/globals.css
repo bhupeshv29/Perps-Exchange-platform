@@ -2,41 +2,40 @@
 
 :root {
   /* ---------- Background ---------- */
-  --background: #0b0f14;
-  --foreground: #f8fafc;
+  --background: #05070a;
+  --foreground: #e6edf3;
 
   /* ---------- Surface ---------- */
-  --surface: #111827;
-  --surface-secondary: #1a2233;
-  --surface-hover: #202b3d;
+  --surface: #0b1118;
+  --surface-secondary: #111a24;
+  --surface-hover: #172331;
 
   /* ---------- Border ---------- */
-  --border: #2b3648;
+  --border: #1f2a37;
 
   /* ---------- Brand ---------- */
-  --primary: #2563eb;
-  --primary-hover: #1d4ed8;
+  --primary: #f0b90b;
+  --primary-hover: #f8d33a;
 
   /* ---------- Trading ---------- */
-  --bid: #16c784;
-  --ask: #ea3943;
+  --bid: #00c278;
+  --ask: #ff4d5e;
 
   /* ---------- Status ---------- */
-  --success: #22c55e;
-  --warning: #f59e0b;
-  --danger: #ef4444;
+  --success: #00c278;
+  --warning: #f0b90b;
+  --danger: #ff4d5e;
 
   /* ---------- Text ---------- */
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #e6edf3;
+  --text-secondary: #9aa4b2;
+  --text-muted: #667085;
 
   /* ---------- Radius ---------- */
-  --radius: 10px;
+  --radius: 12px;
 }
 
 @theme inline {
-  /* Colors */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
@@ -60,10 +59,8 @@
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
 
-  /* Radius */
   --radius-md: var(--radius);
 
-  /* Fonts */
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -80,7 +77,10 @@ body {
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at top left, rgba(240, 185, 11, 0.07), transparent 28rem),
+    radial-gradient(circle at top right, rgba(0, 194, 120, 0.05), transparent 24rem),
+    var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans);
   text-rendering: optimizeLegibility;
@@ -91,10 +91,30 @@ button {
   cursor: pointer;
 }
 
+button,
+input,
+select,
+textarea {
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease,
+    box-shadow 160ms ease;
+}
+
 input,
 textarea,
 select {
   outline: none;
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+select {
+  color-scheme: dark;
 }
 
 ::-webkit-scrollbar {
@@ -103,12 +123,21 @@ select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #2a394a;
   border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3a4b60;
 }
 
 ::-webkit-scrollbar-track {
   background: transparent;
+}
+
+::selection {
+  background: rgba(240, 185, 11, 0.25);
+  color: var(--text-primary);
 }
 
 input[type="number"] {

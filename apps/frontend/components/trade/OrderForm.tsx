@@ -64,10 +64,10 @@ export function OrderForm() {
 
   return (
     <aside className="flex h-full min-h-0 flex-col rounded-md border border-border bg-surface">
-      <div className="shrink-0 border-b border-border px-3 py-2">
+      {/* <div className="shrink-0 border-b border-border px-3 py-2">
         <h2 className="text-sm font-semibold">Place Order</h2>
         <p className="text-xs text-text-muted">{selectedMarket}</p>
-      </div>
+      </div> */}
 
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -138,7 +138,7 @@ export function OrderForm() {
 
           <OrderInput
             label="Quantity"
-            suffix="BTC"
+            suffix={selectedMarket.substring(0,3)}
             registration={register("qty", {
               valueAsNumber: true,
             })}

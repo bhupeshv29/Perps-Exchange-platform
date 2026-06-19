@@ -19,7 +19,6 @@ export function TopNavbar() {
   }
   return (
     <header className="flex min-h-14 flex-wrap items-center justify-between gap-3 border-b border-border bg-surface px-4 py-2">
-      {" "}
       <div className="flex items-center gap-8">
         <div>
           <p className="text-xs text-text-muted">Market</p>
