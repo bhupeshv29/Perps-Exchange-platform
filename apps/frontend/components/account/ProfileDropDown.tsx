@@ -36,9 +36,9 @@ export function ProfileDropdown() {
             Deposit
           </button>
 
-          <button className="w-full rounded px-3 py-2 text-left text-sm text-text-muted hover:bg-surface-hover">
+          {/* <button className="w-full rounded px-3 py-2 text-left text-sm text-text-muted hover:bg-surface-hover">
             Withdraw
-          </button>
+          </button> */}
 
           <button
             onClick={handleLogout}

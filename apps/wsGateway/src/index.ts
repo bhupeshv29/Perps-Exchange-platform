@@ -111,11 +111,14 @@ wss.on("connection", (ws, req) => {
 });
 
 function sendToClient(client: Client, event: WsEvent) {
-  if (client.ws.readyState !== WebSocket.OPEN) {
-    return;
-  }
+  if (client.ws.readyState !== WebSocket.OPEN) return;
 
-  client.ws.send(JSON.stringify(formatWsEvent(event)));
+  const formattedEvent = formatWsEvent(event);
+  const message = JSON.stringify(formattedEvent);
+
+  if (!message) return;
+
+  client.ws.send(message);
 }
 
 function isPrivateEvent(event: WsEvent): event is PrivateWsEvent {

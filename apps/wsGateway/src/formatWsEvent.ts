@@ -49,6 +49,9 @@ export function formatWsEvent(event: WsEvent): WsEvent {
         },
       };
 
+    case "FUNDING_RATE_UPDATE":
+      return event;
+
     case "POSITION_LIQUIDATED":
       return {
         ...event,

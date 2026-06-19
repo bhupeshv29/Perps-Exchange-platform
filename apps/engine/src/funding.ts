@@ -3,7 +3,7 @@ import { MARKETS, getMarketConfig } from "@repo/common";
 import { balances, markPrices, positions } from "./state/state";
 import { publishDbEvent, publishWsEvent } from "./publish/events";
 
-const FUNDING_INTERVAL_MS = 60_000;
+const FUNDING_INTERVAL_MS = 10_000;
 
 function calculatePositionValue(input: {
   markPrice: number;
