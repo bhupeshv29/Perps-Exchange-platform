@@ -13,6 +13,7 @@ import { processEngineRequest } from "./engine";
 import { saveSnapshot } from "./snapshot/saveSnapShot";
 import { loadSnapshot } from "./snapshot/loadSnapShot";
 import { startPriceConsumer } from "./priceConsumer";
+import { startFundingWorker } from "./funding";
 
 async function startEngineRequestConsumer() {
   while (true) {
@@ -74,6 +75,7 @@ async function startEngine() {
   ]);
 
   await loadSnapshot();
+  startFundingWorker();
 
   setInterval(() => {
     saveSnapshot().catch(console.error);

@@ -62,6 +62,7 @@ function createPosition(input: {
     equity: input.margin,
     liquidationPrice: 0,
     roi: 0,
+    fundingPaid: 0,
 
     updatedAt: Date.now(),
   };
@@ -146,7 +147,9 @@ function closePosition(input: {
     qty: closeQty,
   });
 
-  const releasedMargin = Math.floor((position.margin * closeQty) / position.qty);
+  const releasedMargin = Math.floor(
+    (position.margin * closeQty) / position.qty,
+  );
 
   const closedPosition: ClosedPosition = {
     userId: position.userId,
@@ -190,7 +193,10 @@ function closePosition(input: {
   };
 }
 
-function applyFillForOrder(order: Order, fill: Fill): {
+function applyFillForOrder(
+  order: Order,
+  fill: Fill,
+): {
   updatedPositions: Position[];
   closedPositions: ClosedPosition[];
 } {

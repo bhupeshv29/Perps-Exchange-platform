@@ -53,6 +53,8 @@ export function unscalePosition(position: Position): Position {
       position.liquidationPrice,
     ),
 
+    fundingPaid: unscaleBalance(position.fundingPaid),
+
     // roi is already percentage, don't unscale
     roi: position.roi,
   };

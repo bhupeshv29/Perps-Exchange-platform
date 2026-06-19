@@ -7,6 +7,8 @@ export type MarketConfig = {
   qtyScale: number;
   balanceScale: number;
   maxLeverage: number;
+  // 0.0001 -> 0.01%
+  fundingRate: number;
   isActive: boolean;
 };
 
@@ -18,6 +20,7 @@ export const MARKETS: Record<string, MarketConfig> = {
     qtyScale: 1000,
     balanceScale: 100,
     maxLeverage: 20,
+    fundingRate: 0.0001,
     isActive: true,
   },
   ETHUSDT: {
@@ -27,6 +30,7 @@ export const MARKETS: Record<string, MarketConfig> = {
     qtyScale: 1000,
     balanceScale: 100,
     maxLeverage: 20,
+    fundingRate: 0.0001,
     isActive: true,
   },
   SOLUSDT: {
@@ -36,6 +40,7 @@ export const MARKETS: Record<string, MarketConfig> = {
     qtyScale: 1000,
     balanceScale: 100,
     maxLeverage: 20,
+    fundingRate: 0.0001,
     isActive: true,
   },
 };

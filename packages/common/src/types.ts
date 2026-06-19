@@ -51,6 +51,7 @@ export type Position = {
   equity: number;
   liquidationPrice: number;
   roi: number;
+  fundingPaid: number;
   updatedAt: number;
 };
 
@@ -269,6 +270,15 @@ export type WsEvent =
       marketId: string;
       payload: {
         price: number;
+      };
+      createdAt: number;
+    }
+  | {
+      type: "FUNDING_RATE_UPDATE";
+      marketId: string;
+      payload: {
+        fundingRate: number;
+        nextFundingTime: number;
       };
       createdAt: number;
     };

@@ -8,11 +8,13 @@ type TradeStore = {
   trades: Fill[];
   lastTradePrice: number;
   markPrice: number;
+  fundingRate: number;
 
   setSelectedMarket: (marketId: string) => void;
   setDepth: (depth: Depth) => void;
   addTrade: (trade: Fill) => void;
   setMarkPrice: (price: number) => void;
+  setFundingRate: (rate: number) => void;
   resetDepth: () => void;
   resetTrades: () => void;
   resetPrices: () => void;
@@ -24,6 +26,7 @@ export const useTradeStore = create<TradeStore>((set) => ({
   trades: [],
   lastTradePrice: 0,
   markPrice: 0,
+  fundingRate: 0,
 
   setSelectedMarket: (selectedMarket) =>
     set({
@@ -60,5 +63,9 @@ export const useTradeStore = create<TradeStore>((set) => ({
     set({
       lastTradePrice: 0,
       markPrice: 0,
+    }),
+  setFundingRate: (fundingRate) =>
+    set({
+      fundingRate,
     }),
 }));

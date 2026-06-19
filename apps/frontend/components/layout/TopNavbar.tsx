@@ -6,12 +6,12 @@ import { useWsStore } from "@/stores/ws-store";
 import { useRouter } from "next/navigation";
 import { ProfileDropdown } from "../account/ProfileDropDown";
 
-
 export function TopNavbar() {
   const selectedMarket = useTradeStore((state) => state.selectedMarket);
   const lastTradePrice = useTradeStore((state) => state.lastTradePrice);
   const markPrice = useTradeStore((state) => state.markPrice);
   const connected = useWsStore((state) => state.connected);
+  const fundingRate = useTradeStore((state) => state.fundingRate);
   const router = useRouter();
 
   function changeMarket(marketId: string) {
@@ -44,6 +44,17 @@ export function TopNavbar() {
           <p className="text-xs text-text-muted">Mark Price</p>
           <p className="font-mono text-sm">
             {markPrice ? markPrice.toFixed(2) : "-"}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-xs text-text-muted">Funding Rate</p>
+          <p
+            className={`font-mono text-sm ${
+              fundingRate >= 0 ? "text-bid" : "text-ask"
+            }`}
+          >
+            {(fundingRate * 100).toFixed(4)}%
           </p>
         </div>
       </div>
