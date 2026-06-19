@@ -94,11 +94,22 @@ export const useAccountStore = create<AccountStore>((set) => ({
     })),
 
   updateOrder: (order) =>
-    set((state) => ({
-      orders: state.orders.some((o) => o.id === order.id)
-        ? state.orders.map((o) => (o.id === order.id ? order : o))
-        : [order, ...state.orders],
-    })),
+    set((state) => {
+      const isOpen =
+        order.status === "OPEN" || order.status === "PARTIALLY_FILLED";
+
+      if (!isOpen) {
+        return {
+          orders: state.orders.filter((o) => o.id !== order.id),
+        };
+      }
+
+      return {
+        orders: state.orders.some((o) => o.id === order.id)
+          ? state.orders.map((o) => (o.id === order.id ? order : o))
+          : [order, ...state.orders],
+      };
+    }),
 
   addFill: (fill) =>
     set((state) => ({
