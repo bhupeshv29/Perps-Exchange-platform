@@ -7,11 +7,7 @@ import type {
   ClosedPosition,
 } from "../types";
 
-import {
-  unscaleBalance,
-  unscalePrice,
-  unscaleQty,
-} from "./scaling";
+import { unscaleBalance, unscalePrice, unscaleQty } from "./scaling";
 
 export function unscaleOrder(order: Order): Order {
   return {
@@ -49,6 +45,16 @@ export function unscalePosition(position: Position): Position {
     entryPrice: unscalePrice(position.marketId, position.entryPrice),
     margin: unscaleBalance(position.margin),
     realizedPnl: unscaleBalance(position.realizedPnl),
+
+    unrealizedPnl: unscaleBalance(position.unrealizedPnl),
+    equity: unscaleBalance(position.equity),
+    liquidationPrice: unscalePrice(
+      position.marketId,
+      position.liquidationPrice,
+    ),
+
+    // roi is already percentage, don't unscale
+    roi: position.roi,
   };
 }
 

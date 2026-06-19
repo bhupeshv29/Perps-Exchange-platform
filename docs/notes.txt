@@ -49,7 +49,7 @@ For browser cookie auth later, we’ll parse the cookie from the WS upgrade requ
 DB = persistence/read history
 Admin route = later, sends MARKET_CREATE command to engine
 
-Engine Recovery + // snapshot
+Engine Recovery + // snapshot ✅
 candles
 
 testing.
@@ -127,7 +127,7 @@ apps/engine/src/snapshot/✅
 
 
 
-3. WS events currently send integer ticks. That is okay only if frontend unscales WS payloads too.
+3. WS events currently send integer ticks. That is okay only if frontend unscales WS payloads too.✅
 
 
 backend/ wrap in trycatch in onramp
@@ -138,7 +138,7 @@ After refactoring files, I’d revisit the liquidation math because that’s whe
 ( funding Rate
     they all go into processPriceUpdate() instead of bloating the consumer.)
 
-check api or engine market registry be same otherwise move in common package
+check api or engine market registry be same otherwise move in common package✅
 
 will margin be calculated from leverage or price x quantity
 
@@ -186,11 +186,11 @@ root env
 making frontend
 
 
-1 remember taking type from common package zod infer
-2 nextjs, tailwind, shadcn, axios, zustand, tanstack query
-3 row color not applying
-4 toaster 
-5 GET /markets/:marketId/ticker
+1 remember taking type from common package zod infer✅
+2 nextjs, tailwind, shadcn, axios, zustand, tanstack query✅
+3 row color not applying✅
+4 toaster ✅
+5 GET /markets/:marketId/ticker✅
     GET depth
     GET ticker
     then WS updates
@@ -243,10 +243,47 @@ next feat ->
 
 add tanstack tables
 correct depth cal.✅
-correct the liquidation cal in backend
-maintainance margin check
-self matching stop
-closed position check
+correct the liquidation cal in backend✅
+maintainance margin check✅
+self matching stop✅
+closed position check✅
 order history complete✅
 
-one sided position is creating check in engine
+one sided position is creating check in engine✅
+
+
+3. priceWorker only sends BTCUSDT
+4. lastTradePrice has no REST initial value✅
+
+
+----------------------------------------
+            Completed
+
+            Core Engine
+
+            - Orderbook
+            - Matching engine
+            - Partial fills
+            - Market orders
+            - Limit orders
+            - Self-trade prevention
+            - Positions
+            - Close position
+            - Realized PnL
+            - Unrealized PnL
+            - Liquidation worker
+            - Shared risk calculations
+            - Integer engine
+            - Scaling layer
+            - Binance mark price worker
+            - Margin calculated in backend
+            - Frontend Order Summary
+
+            This is already a solid exchange core
+
+
+
+-------------------------------------------------
+next scope
+    landing page and resdesign component.
+    funding worker

@@ -21,6 +21,7 @@ export type Order = {
   filledQty: number;
   margin: number;
   leverage: number;
+  reduceOnly?: boolean;
   status: OrderStatus;
   createdAt: number;
 };
@@ -44,6 +45,12 @@ export type Position = {
   margin: number;
   leverage: number;
   realizedPnl: number;
+
+  // live values (computed by engine)
+  unrealizedPnl: number;
+  equity: number;
+  liquidationPrice: number;
+  roi: number;
   updatedAt: number;
 };
 
@@ -92,8 +99,8 @@ export type EngineRequest =
         orderType: OrderType;
         price?: number;
         qty: number;
-        margin: number;
         leverage: number;
+        reduceOnly?: boolean;
       };
     }
   | {

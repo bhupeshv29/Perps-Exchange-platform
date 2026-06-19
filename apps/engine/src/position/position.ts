@@ -1,7 +1,13 @@
-import type { Fill, Order, Position, PositionSide, Side } from "@repo/common";
+import {
+  calculatePnlScaled,
+  type Fill,
+  type Order,
+  type Position,
+  type PositionSide,
+  type Side,
+} from "@repo/common";
 
 import { balances, getPositionKey, orders, positions } from "../state/state";
-import { calculatePnl } from "./pnl";
 
 export type PositionUpdateResult = {
   updatedPositions: Position[];
@@ -55,6 +61,12 @@ function createPosition(input: {
     leverage: input.leverage,
 
     realizedPnl: 0,
+
+    unrealizedPnl: 0,
+    equity: input.margin,
+    liquidationPrice: 0,
+    roi: 0,
+
     updatedAt: Date.now(),
   };
 }
@@ -132,7 +144,8 @@ function closePosition(input: {
 
   const closeQty = Math.min(position.qty, input.qty);
 
-  const realizedPnl = calculatePnl({
+  const realizedPnl = calculatePnlScaled({
+    marketId: input.marketId,
     side: position.side,
     entryPrice: position.entryPrice,
     exitPrice: input.price,

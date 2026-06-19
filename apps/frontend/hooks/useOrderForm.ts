@@ -10,8 +10,7 @@ export function useOrderForm() {
       side: "BID",
       orderType: "LIMIT",
       price: undefined,
-      qty: 1,
-      margin: 100,
+      qty: 0.001,
       leverage: 1,
     },
   });
