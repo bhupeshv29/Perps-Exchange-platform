@@ -244,12 +244,16 @@ export async function processCreateOrder(
 
   updateOrderStatus(order);
 
-  const { updatedPositions } = applyFillsToPositions(fills);
+  const { updatedPositions, closedPositions } = applyFillsToPositions(fills);
 
   const remainingQty = order.qty - order.filledQty;
 
   if (remainingQty > 0 && order.type === "LIMIT") {
-    addOrderToBook(order);
+    if (order.reduceOnly) {
+      order.status = order.filledQty > 0 ? "PARTIALLY_FILLED" : "REJECTED";
+    } else {
+      addOrderToBook(order);
+    }
   }
 
   if (remainingQty > 0 && order.type === "MARKET") {
@@ -290,6 +294,14 @@ export async function processCreateOrder(
 
   await publishFills(fills, marketId);
   await publishPositions(updatedPositions);
+
+  for (const closedPosition of closedPositions) {
+    void publishDbEvent({
+      type: "CLOSED_POSITION_CREATED",
+      payload: closedPosition,
+      createdAt: Date.now(),
+    });
+  }
 
   void publishDbEvent({
     type: "ORDER_UPDATED",
