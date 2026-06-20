@@ -13,7 +13,8 @@
     "typescript": "latest"
   },
   "scripts": {
-    "dev": "bun --watch src/index.ts"
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts"
   },
   "peerDependencies": {
     "typescript": "^5",
@@ -26,5 +27,8 @@
     "express": "latest",
     "jsonwebtoken": "latest",
     "zod": "latest"
+  },
+  "dependencies": {
+    "express-rate-limit": "^8.5.2"
   }
 }

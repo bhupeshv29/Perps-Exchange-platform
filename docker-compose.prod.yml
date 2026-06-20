@@ -1,0 +1,55 @@
+name: perps
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: ./apps/backend/dockerfile.prod.backend
+    container_name: perps-backend
+    restart: always
+    ports:
+      - "3001:3001"
+    env_file:
+      - .env.prod
+
+  engine:
+    build:
+      context: .
+      dockerfile: ./apps/engine/dockerfile.prod.engine
+    container_name: perps-engine
+    restart: always
+    env_file:
+      - .env.prod
+    volumes:
+      - engine-snapshots:/app/apps/engine/snapshots
+
+  dbworker:
+    build:
+      context: .
+      dockerfile: ./apps/dbWorker/dockerfile.prod.dbworker
+    container_name: perps-dbworker
+    restart: always
+    env_file:
+      - .env.prod
+
+  wsgateway:
+    build:
+      context: .
+      dockerfile: ./apps/wsGateway/dockerfile.prod.wsgateway
+    container_name: perps-wsgateway
+    restart: always
+    ports:
+      - "3002:3002"
+    env_file:
+      - .env.prod
+
+  priceworker:
+    build:
+      context: .
+      dockerfile: ./apps/priceWorker/dockerfile.prod.priceworker
+    container_name: perps-priceworker
+    restart: always
+    env_file:
+      - .env.prod
+
+volumes:
+  engine-snapshots:

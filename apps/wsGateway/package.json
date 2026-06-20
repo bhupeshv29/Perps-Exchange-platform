@@ -9,7 +9,8 @@
     "@types/jsonwebtoken": "latest"
   },
   "scripts": {
-    "dev": "bun --watch src/index.ts"
+    "dev": "bun --watch src/index.ts",
+    "start": "bun src/index.ts"
   },
   "peerDependencies": {
     "typescript": "^5",

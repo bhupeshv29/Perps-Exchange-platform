@@ -7,6 +7,8 @@ import { signToken } from "../services/jwt";
 
 export const authRouter = Router();
 
+const isProd = process.env.NODE_ENV === "production";
+
 authRouter.post("/signup", validateBody(signupSchema), async (req, res) => {
   const { email, password } = req.body;
 
@@ -37,8 +39,8 @@ authRouter.post("/signup", validateBody(signupSchema), async (req, res) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false,
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 
@@ -71,8 +73,8 @@ authRouter.post("/signin", validateBody(signinSchema), async (req, res) => {
 
   res.cookie("token", token, {
     httpOnly: true,
-    sameSite: "lax",
-    secure: false,
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
 

@@ -10,12 +10,14 @@ import { sendToEngine } from "../services/loopback";
 import { scaleBalance, scalePrice, scaleQty } from "@repo/common";
 
 import { unscaleOrder, unscaleFill } from "@repo/common";
+import { orderLimiter } from "../middleware/rateLimit";
 
 export const orderRouter = Router();
 
 orderRouter.post(
   "/",
   requireAuth,
+  orderLimiter,
   validateBody(createOrderSchema),
   async (req: AuthRequest, res) => {
     try {
@@ -60,6 +62,7 @@ orderRouter.post(
 orderRouter.delete(
   "/",
   requireAuth,
+  orderLimiter,
   validateBody(cancelOrderSchema),
   async (req: AuthRequest, res) => {
     try {

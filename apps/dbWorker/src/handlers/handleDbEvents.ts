@@ -91,6 +91,18 @@ export async function handleDbEvent(event: DbEvent) {
     case "BALANCE_UPDATED": {
       const balance = event.payload;
 
+      const userExists = await prisma.user.findUnique({
+        where: { id: balance.userId },
+        select: { id: true },
+      });
+
+      if (!userExists) {
+        console.warn("Skipping BALANCE_UPDATED because user does not exist", {
+          userId: balance.userId,
+        });
+        return;
+      }
+
       await prisma.balance.upsert({
         where: {
           userId: balance.userId,
