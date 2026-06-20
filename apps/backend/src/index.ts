@@ -7,6 +7,7 @@ import { authRouter } from "./routes/auth.routes";
 import { orderRouter } from "./routes/order.routes";
 import { accountRouter } from "./routes/account.routes";
 import { marketRouter } from "./routes/market.routes";
+import { accountLimiter, authLimiter, globalLimiter, orderLimiter } from "./middleware/rateLimit";
 
 const app = express();
 
@@ -14,19 +15,25 @@ app.use(
   cors({
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
     credentials: true,
-  })
+  }),
 );
 
 app.use(express.json());
 app.use(cookieParser());
+app.set("trust proxy", 1);
+
+app.use(globalLimiter);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.use("/auth", authRouter);
+app.use("/auth", authLimiter, authRouter);
+
 app.use("/orders", orderRouter);
-app.use("/account", accountRouter);
+
+app.use("/account", accountLimiter, accountRouter);
+
 app.use("/markets", marketRouter);
 
 async function main() {

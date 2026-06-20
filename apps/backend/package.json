@@ -27,5 +27,8 @@
     "express": "latest",
     "jsonwebtoken": "latest",
     "zod": "latest"
+  },
+  "dependencies": {
+    "express-rate-limit": "^8.5.2"
   }
 }
