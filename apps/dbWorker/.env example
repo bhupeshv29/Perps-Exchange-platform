@@ -1,3 +1,4 @@
 
-DATABASE_URL =
-REDIS_URL = 
+DATABASE_URL=postgresql://postgres:perps@localhost:5432/perps_exchange
+
+REDIS_URL=redis://localhost:6379

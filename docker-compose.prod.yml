@@ -1,5 +1,28 @@
 name: perps
+
 services:
+  postgres:
+    image: postgres
+    container_name: perps-postgres
+    restart: always
+    environment:
+      POSTGRES_DB: perps_exchange
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: perps
+    ports:
+      - "5432:5432"
+    volumes:
+      - perps-postgres-data:/var/lib/postgresql
+
+  redis:
+    image: redis
+    container_name: perps-redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - perps-redis-data:/data
+
   backend:
     build:
       context: .
@@ -10,6 +33,9 @@ services:
       - "3001:3001"
     env_file:
       - .env.prod
+    depends_on:
+      - postgres
+      - redis
 
   engine:
     build:
@@ -19,6 +45,8 @@ services:
     restart: always
     env_file:
       - .env.prod
+    depends_on:
+      - redis
     volumes:
       - engine-snapshots:/app/apps/engine/snapshots
 
@@ -30,6 +58,9 @@ services:
     restart: always
     env_file:
       - .env.prod
+    depends_on:
+      - postgres
+      - redis
 
   wsgateway:
     build:
@@ -41,6 +72,8 @@ services:
       - "3002:3002"
     env_file:
       - .env.prod
+    depends_on:
+      - redis
 
   priceworker:
     build:
@@ -50,6 +83,10 @@ services:
     restart: always
     env_file:
       - .env.prod
+    depends_on:
+      - redis
 
 volumes:
   engine-snapshots:
+  perps-postgres-data:
+  perps-redis-data:
