@@ -2,12 +2,18 @@ FROM oven/bun:1.3.10
 
 WORKDIR /app
 
-COPY package.json bun.lock ./
-COPY packages ./packages
-COPY apps ./apps
+# workspace files
+COPY package.json bun.lock turbo.json ./
 
-RUN bun install --frozen-lockfile
+# shared packages
+COPY packages ./packages
+
+
+COPY apps/priceWorker ./apps/priceWorker
+
+RUN bun install 
 
 WORKDIR /app/apps/priceWorker
+
 
 CMD ["bun", "run", "src/index.ts"]

@@ -1,1 +1,1 @@
-DATABASE_URL =
+DATABASE_URL=postgresql://postgres:perps@localhost:5432/perps_exchange
