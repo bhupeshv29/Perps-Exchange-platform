@@ -336,3 +336,13 @@ Restart:
 ```bash
 bun run dev
 ```
+
+---
+
+#docker-compose cmd 
+```
+mv .env.example .env.prod
+```
+```
+docker compose docker-compose.prod.yml up -d
+```
