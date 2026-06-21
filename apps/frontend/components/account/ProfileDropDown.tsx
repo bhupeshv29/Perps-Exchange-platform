@@ -12,7 +12,6 @@ export function ProfileDropdown() {
 
   async function handleLogout() {
     await signOut();
-    router.push("/signin");
   }
 
   return (
