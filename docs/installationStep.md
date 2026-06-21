@@ -346,3 +346,7 @@ mv .env.example .env.prod
 ```
 docker compose docker-compose.prod.yml up -d
 ```
+```
+cd apps/frontend
+bun run dev
+```
