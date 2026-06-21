@@ -45,6 +45,7 @@ authRouter.post("/signup", validateBody(signupSchema), async (req, res) => {
   });
 
   return res.status(201).json({
+    token,
     user: {
       id: user.id,
       email: user.email,
@@ -79,6 +80,7 @@ authRouter.post("/signin", validateBody(signinSchema), async (req, res) => {
   });
 
   return res.json({
+    token,
     user: {
       id: user.id,
       email: user.email,
@@ -86,7 +88,12 @@ authRouter.post("/signin", validateBody(signinSchema), async (req, res) => {
   });
 });
 
-authRouter.post("/logout", (_req, res) => {
-  res.clearCookie("token");
+authRouter.post("/logout", (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    sameSite: isProd ? "none" : "lax",
+    secure: isProd,
+  });
+
   return res.json({ message: "Logged out" });
 });

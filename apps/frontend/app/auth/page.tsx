@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { signIn, signUp } from "@/services/auth";
+import { queryClient } from "@/lib/queryClient";
 
 type AuthMode = "signin" | "signup";
 
@@ -54,15 +55,14 @@ const features = [
 
 function AuthPageContent() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const initialMode =
+  const mode: AuthMode =
     searchParams.get("mode") === "signup" ? "signup" : "signin";
 
-  const [mode, setMode] = useState<AuthMode>(initialMode);
-  const [error, setError] = useState("");
-
   const isSignin = mode === "signin";
+  const [error, setError] = useState("");
 
   const {
     register,
@@ -72,9 +72,9 @@ function AuthPageContent() {
   } = useForm<FormData>();
 
   function switchMode(nextMode: AuthMode) {
-    setMode(nextMode);
     setError("");
     reset();
+    router.replace(`${pathname}?mode=${nextMode}`);
   }
 
   async function onSubmit(data: FormData) {
@@ -85,9 +85,13 @@ function AuthPageContent() {
         await signIn(data);
       } else {
         await signUp(data);
+        await signIn(data);
       }
 
-      router.push("/trade/BTCUSDT");
+      await queryClient.invalidateQueries();
+
+      router.replace("/trade/BTCUSDT");
+      router.refresh();
     } catch {
       setError(
         isSignin ? "Invalid email or password" : "Could not create account",
@@ -96,7 +100,7 @@ function AuthPageContent() {
   }
 
   return (
-    <main className="relative max-h-screen overflow-x-hidden bg-[#080b0f] text-text-primary">
+    <main className="relative min-h-screen overflow-x-hidden bg-[#080b0f] text-text-primary">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,235,0.08),transparent_35%)]" />
       <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.04)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.04)_1px,transparent_1px)] bg-[size:24px_24px] opacity-30" />
 
@@ -143,7 +147,6 @@ function AuthPageContent() {
             <div className="mt-8 border-t border-border pt-6 lg:mt-10 lg:pt-8">
               <div className="flex gap-3 sm:gap-4">
                 <Users className="shrink-0 text-[#facc15]" size={22} />
-
                 <div>
                   <p className="text-xs text-text-secondary sm:text-sm">
                     Join traders testing a production-style exchange.

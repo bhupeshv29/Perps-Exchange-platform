@@ -3,6 +3,7 @@ import type { WsEvent } from "@repo/common";
 import { useTradeStore } from "@/stores/trade-store";
 import { useWsStore } from "@/stores/ws-store";
 import { useAccountStore } from "@/stores/account-store";
+import { getSession } from "next-auth/react";
 
 export class WebSocketManager {
   private static instance: WebSocketManager;
@@ -19,14 +20,22 @@ export class WebSocketManager {
     return WebSocketManager.instance;
   }
 
-  connect() {
+  async connect() {
     if (this.ws) return;
 
-    this.ws = new WebSocket(process.env.NEXT_PUBLIC_WS_URL!);
+    const session = await getSession();
+    const token = session?.backendToken;
+
+    const wsUrl = new URL(process.env.NEXT_PUBLIC_WS_URL!);
+
+    if (token) {
+      wsUrl.searchParams.set("token", token);
+    }
+
+    this.ws = new WebSocket(wsUrl.toString());
 
     this.ws.onopen = () => {
       useWsStore.getState().setConnected(true);
-      console.log("ws connected");
 
       if (this.currentMarket) {
         this.send({
@@ -43,12 +52,10 @@ export class WebSocketManager {
     this.ws.onclose = () => {
       useWsStore.getState().setConnected(false);
       this.ws = null;
-      console.log("ws disconnected");
     };
 
     this.ws.onerror = () => {
       useWsStore.getState().setConnected(false);
-      console.log("ws error");
     };
   }
 

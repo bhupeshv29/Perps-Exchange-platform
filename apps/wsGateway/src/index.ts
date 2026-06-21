@@ -44,6 +44,21 @@ function parseCookies(cookieHeader?: string): Record<string, string> {
     }, {});
 }
 
+function getUserIdFromRequest(req: any): string | undefined {
+  const url = new URL(req.url ?? "/", "http://localhost");
+  const token = url.searchParams.get("token");
+
+  if (token) {
+    try {
+      return verifyToken(token).userId;
+    } catch {
+      return undefined;
+    }
+  }
+
+  return getUserIdFromCookie(req?.headers?.cookie);
+}
+
 function getUserIdFromCookie(cookieHeader?: string): string | undefined {
   const cookies = parseCookies(cookieHeader);
 
@@ -65,7 +80,7 @@ function getUserIdFromCookie(cookieHeader?: string): string | undefined {
 wss.on("connection", (ws, req) => {
   const client: Client = {
     ws,
-    userId: getUserIdFromCookie(req.headers.cookie),
+    userId: getUserIdFromRequest(req.headers.cookie),
     marketIds: new Set(),
   };
 
