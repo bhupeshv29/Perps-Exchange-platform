@@ -17,11 +17,7 @@ import {
 
 export const accountRouter = Router();
 
-accountRouter.post(
-  "/on-ramp",
-  requireAuth,
-  validateBody(onRampSchema),
-  async (req: AuthRequest, res) => {
+accountRouter.post( "/on-ramp", requireAuth, validateBody(onRampSchema), async (req: AuthRequest, res) => {
     const response = await sendToEngine({
       type: "ON_RAMP",
       payload: {
@@ -90,8 +86,7 @@ accountRouter.get("/orders", requireAuth, async (req: AuthRequest, res) => {
   return res.json({
     orders: orders.map((order) => ({
       ...order,
-      price:
-        order.price === null ? null : unscalePrice(order.marketId, order.price),
+      price: order.price === null ? null : unscalePrice(order.marketId, order.price),
       qty: unscaleQty(order.marketId, order.qty),
       filledQty: unscaleQty(order.marketId, order.filledQty),
       margin: unscaleBalance(order.margin),
@@ -118,11 +113,8 @@ accountRouter.get("/fills", requireAuth, async (req: AuthRequest, res) => {
   });
 });
 
-accountRouter.get(
-  "/closed-positions",
-  requireAuth,
-  async (req: AuthRequest, res) => {
-    const positions = await prisma.closedPosition.findMany({
+accountRouter.get( "/closed-positions", requireAuth, async (req: AuthRequest, res) => {
+const positions = await prisma.closedPosition.findMany({
       where: {
         userId: req.userId!,
       },

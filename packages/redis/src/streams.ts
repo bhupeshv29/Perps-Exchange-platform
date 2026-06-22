@@ -3,7 +3,7 @@ import type { RedisClientType } from "redis";
 export async function publishStreamMessage(
   redis: RedisClientType,
   stream: string,
-  message: unknown
+  message: unknown,
 ) {
   return redis.xAdd(stream, "*", {
     payload: JSON.stringify(message),
@@ -13,7 +13,7 @@ export async function publishStreamMessage(
 export async function createConsumerGroup(
   redis: RedisClientType,
   stream: string,
-  group: string
+  group: string,
 ) {
   try {
     await redis.xGroupCreate(stream, group, "0", {
@@ -36,7 +36,7 @@ export async function consumeStreamMessages(
     consumer: string;
     count?: number;
     blockMs?: number;
-  }
+  },
 ) {
   return redis.xReadGroup(
     input.group,
@@ -48,7 +48,7 @@ export async function consumeStreamMessages(
     {
       COUNT: input.count ?? 100,
       BLOCK: input.blockMs ?? 1000,
-    }
+    },
   );
 }
 
@@ -56,7 +56,7 @@ export async function ackStreamMessage(
   redis: RedisClientType,
   stream: string,
   group: string,
-  messageId: string
+  messageId: string,
 ) {
   return redis.xAck(stream, group, messageId);
 }

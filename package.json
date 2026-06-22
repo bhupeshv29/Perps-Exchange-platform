@@ -29,7 +29,6 @@
     "packages/*"
   ],
   "dependencies": {
-    "PerpsExchangePlatform": ".",
-    "lucide-react": "^1.21.0"
+    "PerpsExchangePlatform": "."
   }
 }

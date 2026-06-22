@@ -1,4 +1,5 @@
-import type { MAX_LEVERAGE } from "../constants";
+import { MAX_LEVERAGE } from "../constants";
+
 
 export type MarketConfig = {
   id: string;
@@ -19,7 +20,7 @@ export const MARKETS: Record<string, MarketConfig> = {
     priceScale: 100,
     qtyScale: 1000,
     balanceScale: 100,
-    maxLeverage: 20,
+    maxLeverage: MAX_LEVERAGE,
     fundingRate: 0.0001,
     isActive: true,
   },
@@ -29,7 +30,7 @@ export const MARKETS: Record<string, MarketConfig> = {
     priceScale: 100,
     qtyScale: 1000,
     balanceScale: 100,
-    maxLeverage: 20,
+    maxLeverage: MAX_LEVERAGE,
     fundingRate: 0.0001,
     isActive: true,
   },
@@ -39,7 +40,7 @@ export const MARKETS: Record<string, MarketConfig> = {
     priceScale: 100,
     qtyScale: 1000,
     balanceScale: 100,
-    maxLeverage: 20,
+    maxLeverage: MAX_LEVERAGE,
     fundingRate: 0.0001,
     isActive: true,
   },

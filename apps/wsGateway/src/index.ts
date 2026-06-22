@@ -11,18 +11,11 @@ type Client = {
   userId?: string;
 };
 
-type PrivateWsEvent = Extract<
-  WsEvent,
-  {
-    userId: string;
-  }
->;
+type PrivateWsEvent = Extract<WsEvent, { userId: string }>;
 
 const clients = new Set<Client>();
 
-const wss = new WebSocketServer({
-  port: Number(process.env.WS_PORT || 3002),
-});
+const wss = new WebSocketServer({ port: Number(process.env.WS_PORT || 3002) });
 
 function parseCookies(cookieHeader?: string): Record<string, string> {
   if (!cookieHeader) {

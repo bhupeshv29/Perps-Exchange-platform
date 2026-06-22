@@ -7,7 +7,11 @@ import { authRouter } from "./routes/auth.routes";
 import { orderRouter } from "./routes/order.routes";
 import { accountRouter } from "./routes/account.routes";
 import { marketRouter } from "./routes/market.routes";
-import { accountLimiter, authLimiter, globalLimiter } from "./middleware/rateLimit";
+import {
+  accountLimiter,
+  authLimiter,
+  globalLimiter,
+} from "./middleware/rateLimit";
 
 const app = express();
 

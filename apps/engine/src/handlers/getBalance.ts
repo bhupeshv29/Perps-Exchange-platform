@@ -1,8 +1,4 @@
-import type {
-  EngineRequest,
-  EngineResponse,
-  UserBalance,
-} from "@repo/common";
+import type { EngineRequest, EngineResponse, UserBalance } from "@repo/common";
 
 import { balances } from "../state/state";
 

@@ -66,8 +66,7 @@ export function removeFilledOrdersFromBook(book: Orderbook) {
   cleanupSide(book.asks);
 }
 
-
-// below 2 fn is depth only 
+// below 2 fn is depth only
 
 function aggregateSide(sideBook: Record<number, Order[]>): [number, number][] {
   return Object.entries(sideBook)
@@ -93,8 +92,6 @@ export function getDepth(marketId: string): Depth {
     asks: aggregateSide(book.asks).sort((a, b) => a[0] - b[0]),
   };
 }
-
-
 
 //below 2 fn for matching
 

@@ -28,11 +28,8 @@ export async function checkLiquidations(marketId: string) {
     if (equity > maintenanceMargin) {
       void publishWsEvent({
         type: "POSITION_UPDATE",
-
         userId: position.userId,
-
         payload: position,
-
         createdAt: Date.now(),
       });
 
