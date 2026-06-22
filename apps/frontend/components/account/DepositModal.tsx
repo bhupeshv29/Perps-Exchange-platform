@@ -73,4 +73,3 @@ export function DepositModal() {
     </div>
   );
 }
-
