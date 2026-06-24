@@ -80,7 +80,7 @@ export function DepositModal() {
                 className="w-full bg-transparent px-3 py-2 text-sm outline-none"
               />
 
-              <span className="pr-3 text-xs text-text-muted">INR</span>
+              <span className="pr-3 text-xs text-text-muted">USD</span>
             </div>
           </label>
 

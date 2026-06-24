@@ -1,7 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { createRazorpayOrder, createStripeCheckout, verifyRazorpayPayment } from "@/services/payment";
+import {
+  createRazorpayOrder,
+  createStripeCheckout,
+  verifyRazorpayPayment,
+} from "@/services/payment";
 
 declare global {
   interface Window {
@@ -64,6 +68,8 @@ export function useStripeCheckout() {
 }
 
 export function useRazorpayOrder() {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: createRazorpayOrder,
 
@@ -91,8 +97,12 @@ export function useRazorpayOrder() {
               signature: response.razorpay_signature,
             });
 
+            await queryClient.invalidateQueries({
+              queryKey: ["balance"],
+            });
+
             toast.success("Deposit Successful");
-          } catch (error) {
+          } catch {
             toast.error("Payment verification failed");
           }
         },

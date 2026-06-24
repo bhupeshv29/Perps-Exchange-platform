@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { prisma } from "@repo/db";
-
+import { PaymentProvider, PaymentStatus, scaleBalance } from "@repo/common";
 import { requireAuth } from "../middleware/auth";
 import { validateBody } from "../middleware/validate";
 import {
@@ -12,9 +12,7 @@ import {
   razorpay,
   stripe,
   verifyRazorpaySignature,
-  verifyRazorpayWebhookSignature,
 } from "../services/payment.service";
-import { PaymentProvider, PaymentStatus } from "@repo/common";
 import { sendToEngine } from "../services/loopback";
 
 export const paymentRouter = Router();
@@ -27,11 +25,13 @@ paymentRouter.post(
     const userId = req.userId!;
     const { amount } = req.body;
 
+    const amountInPaise = scaleBalance(amount);
+
     const payment = await prisma.payment.create({
       data: {
         userId,
-        amount,
-        currency: "INR",
+        amount: amountInPaise,
+        currency: "USD",
         provider: PaymentProvider.STRIPE,
         status: PaymentStatus.CREATED,
       },
@@ -45,14 +45,14 @@ paymentRouter.post(
       metadata: {
         paymentId: payment.id,
         userId,
-        amount: String(amount),
+        amount: String(amountInPaise),
       },
       line_items: [
         {
           quantity: 1,
           price_data: {
-            currency: "inr",
-            unit_amount: amount * 100 * 100,
+            currency: "USD",
+            unit_amount: amountInPaise,
             product_data: {
               name: "LeverageX Demo Deposit",
             },
@@ -83,24 +83,26 @@ paymentRouter.post(
     const userId = req.userId!;
     const { amount } = req.body;
 
+    const amountInPaise = scaleBalance(amount);
+
     const payment = await prisma.payment.create({
       data: {
         userId,
-        amount,
-        currency: "INR",
+        amount: amountInPaise,
+        currency: "USD",
         provider: PaymentProvider.RAZORPAY,
         status: PaymentStatus.CREATED,
       },
     });
 
     const order = await razorpay.orders.create({
-      amount: amount * 100,
-      currency: "INR",
+      amount: amountInPaise,
+      currency: "USD",
       receipt: payment.id,
       notes: {
         paymentId: payment.id,
         userId,
-        amount: String(amount),
+        amount: String(amountInPaise),
       },
     });
 
@@ -121,6 +123,7 @@ paymentRouter.post(
     });
   },
 );
+
 paymentRouter.post(
   "/razorpay/verify",
   requireAuth,
