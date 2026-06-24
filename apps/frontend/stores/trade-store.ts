@@ -1,6 +1,7 @@
 import { create } from "zustand";
 
 import type { Depth, Fill } from "@repo/common";
+import { Candle } from "@/types/api";
 
 type TradeStore = {
   selectedMarket: string;
@@ -9,6 +10,7 @@ type TradeStore = {
   lastTradePrice: number;
   markPrice: number;
   fundingRate: number;
+  candles: Candle[];
 
   setSelectedMarket: (marketId: string) => void;
   setDepth: (depth: Depth) => void;
@@ -18,6 +20,7 @@ type TradeStore = {
   resetDepth: () => void;
   resetTrades: () => void;
   resetPrices: () => void;
+  setCandles: (candles: Candle[]) => void;
 };
 
 export const useTradeStore = create<TradeStore>((set) => ({
@@ -27,6 +30,7 @@ export const useTradeStore = create<TradeStore>((set) => ({
   lastTradePrice: 0,
   markPrice: 0,
   fundingRate: 0,
+  candles: [],
 
   setSelectedMarket: (selectedMarket) =>
     set({
@@ -68,4 +72,5 @@ export const useTradeStore = create<TradeStore>((set) => ({
     set({
       fundingRate,
     }),
+  setCandles: (candles) => set({ candles }),
 }));

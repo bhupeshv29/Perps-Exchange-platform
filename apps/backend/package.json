@@ -29,7 +29,9 @@
     "zod": "latest"
   },
   "dependencies": {
+    "@types/pg": "^8.20.0",
     "express-rate-limit": "^8.5.2",
+    "pg": "^8.22.0",
     "razorpay": "^2.9.6",
     "stripe": "^22.2.3"
   }

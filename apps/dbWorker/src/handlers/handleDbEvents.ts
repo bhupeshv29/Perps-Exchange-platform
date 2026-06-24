@@ -1,5 +1,6 @@
 import type { DbEvent } from "@repo/common";
 import { prisma } from "@repo/db";
+import { insertMarketTrade } from "../timescale";
 
 export async function handleDbEvent(event: DbEvent) {
   switch (event.type) {
@@ -66,6 +67,7 @@ export async function handleDbEvent(event: DbEvent) {
 
     case "FILL_CREATED": {
       const fill = event.payload;
+      await insertMarketTrade(event.payload);
 
       await prisma.fill.upsert({
         where: {

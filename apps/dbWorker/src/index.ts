@@ -8,9 +8,11 @@ import {
 
 import { connectRedis, redis } from "./redis";
 import { handleDbEvent } from "./handlers/handleDbEvents";
+import { initTimescale } from "./timescale";
 
 async function startDbWorker() {
   await connectRedis();
+  await initTimescale();
 
   await createConsumerGroup(redis, STREAMS.DB_EVENTS, GROUPS.DB_WORKER);
 
