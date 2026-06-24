@@ -1,5 +1,0 @@
-PORT=3001
-DATABASE_URL=postgresql://postgres:perps@localhost:5432/perps_exchange
-JWT_SECRET=secret
-REDIS_URL=redis://localhost:6379
-FRONTEND_URL=http://localhost:3000

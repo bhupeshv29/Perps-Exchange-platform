@@ -1,4 +1,4 @@
-# Local Setup
+# installation steps
 
 ## Prerequisites
 
@@ -38,7 +38,48 @@ bun install
 
 ---
 
-# Environment Variables
+# Option 1
+
+## Running locally using docker-compose
+
+```
+mv .env.example .env.prod
+```
+
+```
+docker compose docker-compose.prod.yml up -d
+```
+
+```
+cd apps/frontend
+```
+
+Create:
+
+```bash
+apps/backend/.env
+```
+
+```env
+NEXT_PUBLIC_API_URL = http://localhost:3001
+NEXT_PUBLIC_WS_URL = ws://localhost:3002
+
+AUTH_SECRET = secret
+NEXTAUTH_SECRET = secret
+
+```
+
+```bash
+bun run dev
+```
+
+---
+
+# option 2
+
+## run locally using manual setup
+
+Environment Variables
 
 ## Backend
 
@@ -49,13 +90,11 @@ apps/backend/.env
 ```
 
 ```env
-PORT=3000
-
-JWT_SECRET=secret
-
-DATABASE_URL=postgresql://postgres:"secret"@localhost:5432/perps_exchange
-
+PORT=3001
+DATABASE_URL=postgresql://postgres:perps@localhost:5432/perps_exchange
+JWT_SECRET=super-secret-change-this
 REDIS_URL=redis://localhost:6379
+FRONTEND_URL=http://localhost:3000
 ```
 
 ---
@@ -69,9 +108,10 @@ apps/db-worker/.env
 ```
 
 ```env
-DATABASE_URL=postgresql://postgres:secret@localhost:5432/perps_exchange
 
+DATABASE_URL=postgresql://postgres:perps@localhost:5432/perps_exchange
 REDIS_URL=redis://localhost:6379
+
 ```
 
 ---
@@ -86,10 +126,9 @@ apps/ws-gateway/.env
 
 ```env
 WS_PORT=3002
-
-JWT_SECRET=secret
-
+JWT_SECRET=super-secret-change-this
 REDIS_URL=redis://localhost:6379
+
 ```
 
 ---
@@ -108,11 +147,43 @@ REDIS_URL=redis://localhost:6379
 
 ---
 
+## PriceWorker
+
+Create:
+
+```bash
+apps/priceWorker/.env
+```
+
+```env
+REDIS_URL=redis://localhost:6379
+```
+
+## Frontend
+
+Create:
+
+```bash
+apps/frontend/.env
+```
+
+```env
+NEXT_PUBLIC_API_URL = http://localhost:3001
+NEXT_PUBLIC_WS_URL = ws://localhost:3002
+
+AUTH_SECRET = secret
+NEXTAUTH_SECRET = secret
+
+```
+
+---
+
 # Start Infrastructure
 
 ## Redis + PostgreSQL
 
 ```bash
+cd docker
 docker compose up -d
 ```
 
@@ -136,6 +207,10 @@ postgres
 Generate client:
 
 ```bash
+cd packages/db
+```
+
+```bash
 bunx prisma generate
 ```
 
@@ -151,131 +226,9 @@ bunx prisma migrate dev
 
 Open separate terminals.
 
----
-
-## Engine
-
 ```bash
-cd apps/engine
-
 bun run dev
 ```
-
-Expected:
-
-```text
-snapshot loaded
-engine running
-```
-
-or
-
-```text
-no snapshot found
-engine running
-```
-
----
-
-## DB Worker
-
-```bash
-cd apps/db-worker
-
-bun run dev
-```
-
-Expected:
-
-```text
-db worker running
-```
-
----
-
-## WS Gateway
-
-```bash
-cd apps/ws-gateway
-
-bun run dev
-```
-
-Expected:
-
-```text
-ws-gateway running on port 3002
-```
-
----
-
-## Backend
-
-```bash
-cd apps/backend
-
-bun run dev
-```
-
-Expected:
-
-```text
-backend running on port 3000
-```
-
----
-
-## Frontend
-
-```bash
-cd apps/frontend
-
-bun run dev
-```
-
-Expected:
-
-```text
-ready - started server on http://localhost:3001
-```
-
----
-
-# Verify Redis Streams
-
-Open Redis CLI:
-
-```bash
-docker exec -it redis redis-cli
-```
-
-Check streams:
-
-```redis
-XRANGE ENGINE_REQUESTS - +
-XRANGE ENGINE_RESPONSES - +
-XRANGE DB_EVENTS - +
-XRANGE PRICE_UPDATES - +
-```
-
----
-
-# Verify PostgreSQL
-
-```bash
-cd packages/db
-bunx prisma studio
-```
-
-# Service Ports
-
-| Service | Port |
-|----------|----------|
-| Frontend | 3001 |
-| Backend | 3000 |
-| WS Gateway | 3002 |
-| Redis | 6379 |
-| PostgreSQL | 5432 |
 
 ---
 
@@ -338,15 +291,3 @@ bun run dev
 ```
 
 ---
-
-#docker-compose cmd 
-```
-mv .env.example .env.prod
-```
-```
-docker compose docker-compose.prod.yml up -d
-```
-```
-cd apps/frontend
-bun run dev
-```

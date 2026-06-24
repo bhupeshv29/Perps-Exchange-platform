@@ -290,3 +290,14 @@ export type MarkPriceUpdate = {
   price: number;
   createdAt: number;
 };
+export enum PaymentProvider {
+  STRIPE = "STRIPE",
+  RAZORPAY = "RAZORPAY",
+}
+
+export enum PaymentStatus {
+  CREATED = "CREATED",
+  PENDING = "PENDING",
+  SUCCESS = "SUCCESS",
+  FAILED = "FAILED",
+}
