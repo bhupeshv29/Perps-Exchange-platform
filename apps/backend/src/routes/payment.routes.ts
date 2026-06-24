@@ -52,7 +52,7 @@ paymentRouter.post(
           quantity: 1,
           price_data: {
             currency: "inr",
-            unit_amount: amount * 100,
+            unit_amount: amount * 100 * 100,
             product_data: {
               name: "LeverageX Demo Deposit",
             },

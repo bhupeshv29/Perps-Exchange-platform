@@ -9,10 +9,6 @@
     "moduleDetection": "force",
     "jsx": "react-jsx",
     "allowJs": true,
-    "include": [
-      "src/**/*.ts",
-      "src/**/*.d.ts"
-    ],
     // Bundler mode
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
