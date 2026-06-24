@@ -12,6 +12,8 @@ import {
   authLimiter,
   globalLimiter,
 } from "./middleware/rateLimit";
+import { paymentRouter } from "./routes/payment.routes";
+import { webhookRouter } from "./routes/webhook.routes";
 
 const app = express();
 
@@ -20,6 +22,14 @@ app.use(
     origin: process.env.FRONTEND_URL || "http://localhost:3000",
     credentials: true,
   }),
+);
+
+app.use(
+  "/webhooks/stripe", express.raw({ type: "application/json" }),
+);
+
+app.use(
+  "/webhooks/razorpay", express.raw({ type: "application/json" }),
 );
 
 app.use(express.json());
@@ -39,6 +49,10 @@ app.use("/orders", orderRouter);
 app.use("/account", accountLimiter, accountRouter);
 
 app.use("/markets", marketRouter);
+
+app.use("/payments", paymentRouter);
+
+app.use("/webhooks", webhookRouter);
 
 async function main() {
   await connectRedis();
