@@ -1,10 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import {
-  createRazorpayOrder,
-  createStripeCheckout,
-} from "@/services/payment";
+import { createRazorpayOrder, createStripeCheckout, verifyRazorpayPayment } from "@/services/payment";
 
 declare global {
   interface Window {
@@ -86,8 +83,18 @@ export function useRazorpayOrder() {
         description: "Demo USDT Deposit",
         order_id: data.orderId,
 
-        handler: () => {
-          toast.success("Payment submitted. Balance will update after verification.");
+        handler: async (response) => {
+          try {
+            await verifyRazorpayPayment({
+              paymentId: response.razorpay_payment_id,
+              orderId: response.razorpay_order_id,
+              signature: response.razorpay_signature,
+            });
+
+            toast.success("Deposit Successful");
+          } catch (error) {
+            toast.error("Payment verification failed");
+          }
         },
 
         theme: {

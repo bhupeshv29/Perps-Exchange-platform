@@ -23,3 +23,15 @@ export async function createRazorpayOrder(amount: number) {
 
   return data;
 }
+
+export async function verifyRazorpayPayment(input: {
+  paymentId: string;
+
+  orderId: string;
+
+  signature: string;
+}) {
+  const { data } = await api.post("/payments/razorpay/verify", input);
+
+  return data;
+}

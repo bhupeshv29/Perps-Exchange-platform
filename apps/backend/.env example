@@ -3,3 +3,14 @@ DATABASE_URL=postgresql://postgres:perps@localhost:5432/perps_exchange
 JWT_SECRET=secret
 REDIS_URL=redis://localhost:6379
 FRONTEND_URL=http://localhost:3000
+
+
+STRIPE_SECRET_KEY = sk_test_51Tlo25A1DBJSNiVYIlvEdW3gwcW7b2dviT1MfA39WtmSUqXywPxyWAdxX4lkbsidOnOacG1hz7GjWfqutxDwvkOt00u8GjEG5o
+
+STRIPE_WEBHOOK_SECRET=
+
+RAZORPAY_KEY_ID = rzp_test_T5Q4KqmRFeXu5Y
+
+RAZORPAY_KEY_SECRET = HYJEBWRhGRKR9RBmWpXyZOIb
+
+RAZORPAY_WEBHOOK_SECRET = my_super_secret

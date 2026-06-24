@@ -6,11 +6,16 @@ import { validateBody } from "../middleware/validate";
 import {
   createRazorpayOrderSchema,
   createStripeCheckoutSchema,
+  verifyRazorPaymentSchema,
 } from "../schemas/payment.schema";
-import { razorpay, stripe } from "../services/payment.service";
+import {
+  razorpay,
+  stripe,
+  verifyRazorpaySignature,
+  verifyRazorpayWebhookSignature,
+} from "../services/payment.service";
 import { PaymentProvider, PaymentStatus } from "@repo/common";
-
-
+import { sendToEngine } from "../services/loopback";
 
 export const paymentRouter = Router();
 
@@ -116,4 +121,68 @@ paymentRouter.post(
     });
   },
 );
+paymentRouter.post(
+  "/razorpay/verify",
+  requireAuth,
+  validateBody(verifyRazorPaymentSchema),
+  async (req, res) => {
+    const userId = req.userId!;
+    const { paymentId, orderId, signature } = req.body;
 
+    const valid = verifyRazorpaySignature({
+      paymentId,
+      orderId,
+      signature,
+    });
+
+    if (!valid) {
+      return res.status(400).json({
+        message: "Invalid payment signature",
+      });
+    }
+
+    const payment = await prisma.payment.findFirst({
+      where: {
+        providerOrderId: orderId,
+        userId,
+      },
+    });
+
+    if (!payment) {
+      return res.status(404).json({
+        message: "Payment not found",
+      });
+    }
+
+    const result = await prisma.payment.updateMany({
+      where: {
+        id: payment.id,
+        status: PaymentStatus.PENDING,
+      },
+      data: {
+        status: PaymentStatus.SUCCESS,
+        providerPaymentId: paymentId,
+      },
+    });
+
+    if (result.count === 0) {
+      return res.json({
+        success: true,
+        message: "Payment already processed",
+      });
+    }
+
+    await sendToEngine({
+      type: "ON_RAMP",
+      payload: {
+        userId,
+        amount: payment.amount,
+      },
+    });
+
+    return res.json({
+      success: true,
+      message: "Payment verified and balance credited",
+    });
+  },
+);
