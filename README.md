@@ -90,16 +90,7 @@ cd apps/frontend
 Create:
 
 ```bash
-touch apps/frontend/.env
-```
-
-```env
-NEXT_PUBLIC_API_URL = http://localhost:3001
-NEXT_PUBLIC_WS_URL = ws://localhost:3002
-
-AUTH_SECRET = secret
-NEXTAUTH_SECRET = secret
-
+mv .env.example .env
 ```
 
 ```bash
