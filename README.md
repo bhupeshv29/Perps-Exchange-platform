@@ -56,7 +56,7 @@ docker compose version
 # Clone Repository
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/bhupeshv29/Perps-Exchange-platform.git
 
 cd perps-exchange-platform
 ```
@@ -90,7 +90,7 @@ cd apps/frontend
 Create:
 
 ```bash
-apps/backend/.env
+touch apps/frontend/.env
 ```
 
 ```env
