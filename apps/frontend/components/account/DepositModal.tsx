@@ -94,7 +94,7 @@ export function DepositModal() {
               : "Add Balance Normally"}
           </button>
 
-          <button
+          {/* <button
             type="button"
             disabled={isInvalidAmount || isLoading}
             onClick={payWithRazorpay}
@@ -103,7 +103,7 @@ export function DepositModal() {
             {razorpayMutation.isPending
               ? "Creating Razorpay order..."
               : "Pay with Razorpay"}
-          </button>
+          </button> */}
 
           {/* <button
             type="button"
