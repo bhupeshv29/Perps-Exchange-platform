@@ -7,13 +7,13 @@ import { authRouter } from "./routes/auth.routes";
 import { orderRouter } from "./routes/order.routes";
 import { accountRouter } from "./routes/account.routes";
 import { marketRouter } from "./routes/market.routes";
-import {
-  accountLimiter,
-  authLimiter,
-  globalLimiter,
-} from "./middleware/rateLimit";
-import { paymentRouter } from "./routes/payment.routes";
-import { webhookRouter } from "./routes/webhook.routes";
+// import {
+//   accountLimiter,
+//   authLimiter,
+//   globalLimiter,
+// } from "./middleware/rateLimit";
+// import { paymentRouter } from "./routes/payment.routes";
+// import { webhookRouter } from "./routes/webhook.routes";
 
 const app = express();
 
@@ -24,35 +24,30 @@ app.use(
   }),
 );
 
-app.use(
-  "/webhooks/stripe", express.raw({ type: "application/json" }),
-);
+// app.use("/webhooks/stripe", express.raw({ type: "application/json" }));
 
-app.use(
-  "/webhooks/razorpay", express.raw({ type: "application/json" }),
-);
+// app.use("/webhooks/razorpay", express.raw({ type: "application/json" }));
 
 app.use(express.json());
 app.use(cookieParser());
-app.set("trust proxy", 1);
-
-app.use(globalLimiter);
+// app.set("trust proxy", 1);
+// app.use(globalLimiter);
 
 app.get("/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
-app.use("/auth", authLimiter, authRouter);
+app.use("/auth", authRouter);
 
 app.use("/orders", orderRouter);
 
-app.use("/account", accountLimiter, accountRouter);
+app.use("/account", accountRouter);
 
 app.use("/markets", marketRouter);
 
-app.use("/payments", paymentRouter);
+// app.use("/payments", paymentRouter);
 
-app.use("/webhooks", webhookRouter);
+// app.use("/webhooks", webhookRouter);
 
 async function main() {
   await connectRedis();

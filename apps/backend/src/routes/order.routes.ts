@@ -10,11 +10,16 @@ import { sendToEngine } from "../services/loopback";
 import { scaleBalance, scalePrice, scaleQty } from "@repo/common";
 
 import { unscaleOrder, unscaleFill } from "@repo/common";
-import { orderLimiter } from "../middleware/rateLimit";
+// import { orderLimiter } from "../middleware/rateLimit";
 
 export const orderRouter = Router();
 
-orderRouter.post("/", requireAuth,  orderLimiter, validateBody(createOrderSchema), async (req: AuthRequest, res) => {
+orderRouter.post(
+  "/",
+  requireAuth,
+
+  validateBody(createOrderSchema),
+  async (req: AuthRequest, res) => {
     try {
       const body = req.body;
 
@@ -25,7 +30,10 @@ orderRouter.post("/", requireAuth,  orderLimiter, validateBody(createOrderSchema
           marketId: body.marketId,
           side: body.side,
           orderType: body.orderType,
-          price: body.price === undefined ? undefined : scalePrice(body.marketId, body.price),
+          price:
+            body.price === undefined
+              ? undefined
+              : scalePrice(body.marketId, body.price),
           qty: scaleQty(body.marketId, body.qty),
           leverage: body.leverage,
           reduceOnly: body.reduceOnly,
@@ -51,7 +59,12 @@ orderRouter.post("/", requireAuth,  orderLimiter, validateBody(createOrderSchema
   },
 );
 
-orderRouter.delete("/", requireAuth, orderLimiter, validateBody(cancelOrderSchema), async (req: AuthRequest, res) => {
+orderRouter.delete(
+  "/",
+  requireAuth,
+
+  validateBody(cancelOrderSchema),
+  async (req: AuthRequest, res) => {
     try {
       const response = await sendToEngine({
         type: "CANCEL_ORDER",
